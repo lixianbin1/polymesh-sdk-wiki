@@ -7,29 +7,29 @@ Polymesh是一种使您能够在区块链上创建、发行和管理数字证券
 ## API目录
 
  - 账户管理
-  - [获取账户实例](#获取账户实例) getAccount
-  - [查询账户余额](#查询账户余额)
-  - [查询默认签名账户](#查询默认签名账户)
-  - [查询签名账户列表](#查询签名账户列表)
-  - [创建多个签名账户](#创建多个签名账户)
-  - [邀请辅助账户](#邀请辅助账户)
-  - [修改辅助账户权限](#修改辅助账户权限)
-  - [撤销辅助账户权限](#撤销辅助账户权限)
-  - [补贴辅助账户](#补贴辅助账户)
-  - [冻结辅助账户](#冻结辅助账户)
-  - [解冻辅助账户](解冻辅助账户)
-  - [删除辅助账户](#删除辅助账户)
-  - [离开辅助账户的身份](#离开辅助账户的身份)
+   - [获取账户实例](#获取账户实例) getAccount()
+   - [查询账户余额](#查询账户余额) getAccountBalance()
+   - [查询默认签名账户](#查询默认签名账户) getSigningAccount()
+   - [查询签名账户列表](#查询签名账户列表) getSigningAccounts()
+   - [创建多个签名账户](#创建多个签名账户) createMultiSigAccount()
+   - [邀请辅助账户](#邀请辅助账户) inviteAccount()
+   - [修改辅助账户权限](#修改辅助账户权限) modifyPermissions()
+   - [撤销辅助账户权限](#撤销辅助账户权限) revokePermissions()
+   - [补贴辅助账户](#补贴辅助账户) subsidizeAccount()
+   - [冻结辅助账户](#冻结辅助账户) freezeSecondaryAccounts()
+   - [解冻辅助账户](解冻辅助账户) unfreezeSecondaryAccounts()
+   - [删除辅助账户](#删除辅助账户)removeSecondaryAccounts()
+   - [离开辅助账户的身份](#离开辅助账户的身份) leaveIdentity()
  - 资产
-  - 获取资产实例
-  - 查询区块链资产
-  - 申领以太坊股票代码
-  - 查询拥有资产
-  - 获取投票者保留
-  - 获取投票者保留
-  - 是可编辑的
-  - 预定资产
-  - 创建资产
+   - [获取资产实例](#获取资产实例) getAsset()
+   - [查询区块链资产](#查询区块链资产) get()
+   - [申领以太坊股票代码](#申领以太坊股票代码)
+   - [查询拥有资产](#查询拥有资产) getAssets() 
+   - [查询预定资产](#查询预定资产) getTickerReservation()
+   - [查询拥有预定资产](#查询预定资产) getTickerReservations()
+   - [查询名称是否可用](#查询名称是否可用) isTickerAvailable()
+   - [预定资产](#预定资产) reserveTicker()
+   - [创建资产](#创建资产) createAsset()
 
 ### 账户管理
 
@@ -230,7 +230,7 @@ async function run(){
     // 必选，补贴的金额，需要BigNumber类型
     allowance:new BigNumber(101),
     // 指定的辅助账户地址
-    beneficiary:"5HQJBgwoAjkSMZNsCUYv5TxQkSFAoF9atopCidxHCXjcuvHq"
+    beneficiary:"5HQJBgwoAjkSMZNs...v5TxQkSFAoF9atopCidxHCXjcuvHq"
   });
   const subsidize = await invite.run()
 }
@@ -322,7 +322,7 @@ run()
 
 #### 获取资产实例
 
-根据资产名称获取资产实例 
+根据资产名称获取资产实例 getAsset()
 
 ```js
 import { Polymesh } from '@polymeshassociation/polymesh-sdk';
@@ -341,7 +341,7 @@ run()
 
 #### 查询区块链资产
 
-查询区块链上的所有资产
+查询区块链上的所有资产 get()
 
 ```js
 import { Polymesh } from '@polymeshassociation/polymesh-sdk';
@@ -355,4 +355,127 @@ async function run(){
 run()
 ```
 
+#### 申领以太坊股票代码
+
+claimClassicTicker()
+
 #### 查询资产
+
+获取身份标识拥有的发行资产 getAssets()
+
+```js
+import { Polymesh } from '@polymeshassociation/polymesh-sdk';
+import { LocalSigningManager } from '@polymeshassociation/local-signing-manager';
+// ......
+async function run(){
+  const signingManagerAlice = await LocalSigningManager.create({...});
+  const apiAlice = await Polymesh.connect({...});
+  const assetsList = await apiAlice.assets.getAssets({
+    'owner':'0xa39bd22fd2f078fd1c300614f564dda94a90ad3884601677fb3042b591dbede2',
+  });
+}
+run()
+```
+
+#### 查询预定资产
+
+根据名称查询预定资产 getTickerReservation()
+
+```js
+import { Polymesh } from '@polymeshassociation/polymesh-sdk';
+import { LocalSigningManager } from '@polymeshassociation/local-signing-manager';
+// ......
+async function run(){
+  const signingManagerAlice = await LocalSigningManager.create({...});
+  const apiAlice = await Polymesh.connect({...});
+  const reservation = await apiAlice.assets.getTickerReservation({
+    // 必选参数 ticker
+    'ticker':'QS',
+  });
+}
+run()
+```
+
+#### 查询拥有预定资产
+
+根据身份标识获取拥有的预定资产 getTickerReservations()
+
+```js
+import { Polymesh } from '@polymeshassociation/polymesh-sdk';
+import { LocalSigningManager } from '@polymeshassociation/local-signing-manager';
+// ......
+async function run(){
+  const signingManagerAlice = await LocalSigningManager.create({...});
+  const apiAlice = await Polymesh.connect({...});
+  const reservations = await apiAlice.assets.getTickerReservations({
+    // 必选参数 owner
+    "owner": '0xa39bd22fd2f078fd1c300614f564dda94a90ad3884601677fb3042b591dbede2',
+  });
+}
+run()
+```
+
+#### 查询名称是否可用
+
+查询该ticker名称是否可用 isTickerAvailable()
+
+```js
+import { Polymesh } from '@polymeshassociation/polymesh-sdk';
+import { LocalSigningManager } from '@polymeshassociation/local-signing-manager';
+// ......
+async function run(){
+  const signingManagerAlice = await LocalSigningManager.create({...});
+  const apiAlice = await Polymesh.connect({...});
+  const isTicker = await apiAlice.assets.isTickerAvailable({
+    // 必选参数 ticker
+    "ticker":"LXB",
+  });
+}
+run()
+```
+
+#### 预定资产
+
+使用名称预定资产，防止抢注 reserveTicker()
+
+```js
+import { Polymesh } from '@polymeshassociation/polymesh-sdk';
+import { LocalSigningManager } from '@polymeshassociation/local-signing-manager';
+// ......
+async function run(){
+  const signingManagerAlice = await LocalSigningManager.create({...});
+  const apiAlice = await Polymesh.connect({...});
+  // 在预定之前可先查询是名称否可用
+  const reserve = await apiAlice.assets.reserveTicker({
+    // 必选参数 ticker
+    "ticker":"LXB",
+  });
+}
+run()
+```
+
+#### 创建资产
+
+使用预定资产进行资产的创建 createAsset()
+
+```js
+import { Polymesh } from '@polymeshassociation/polymesh-sdk';
+import { LocalSigningManager } from '@polymeshassociation/local-signing-manager';
+// ......
+async function run(){
+  const signingManagerAlice = await LocalSigningManager.create({...});
+  const apiAlice = await Polymesh.connect({...});
+  const reserveTicker = await apiAlice.assets.reserveTicker({
+    // 必选参数 ticker
+    "ticker":"LXB",
+  });
+  const assetQueue = await reserveTicker.createAsset({
+      "name": "CES0012 Co", //别名
+      "assetType": "EquityPreferred", //类型
+      "isDivisible": false // 是否可分割
+  });
+  const asset = await assetQueue.run();
+
+}
+run()
+```
