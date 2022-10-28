@@ -4,8 +4,6 @@ Polymesh是一种使您能够在区块链上创建、发行和管理数字证券
 
 这是个文档库，旨在为后续学习的人提供一个学习参考
 
-[English](./README_en.md)
-
 ## API目录
 
  - 账户管理
@@ -13,7 +11,7 @@ Polymesh是一种使您能够在区块链上创建、发行和管理数字证券
    - [查询账户余额](#查询账户余额) getAccountBalance
    - [查询默认签名账户](#查询默认签名账户) getSigningAccount
    - [查询签名账户列表](#查询签名账户列表) getSigningAccounts
-   - 创建多个签名账户 createMultiSigAccount
+   - [创建多重签名账户](#创建多重签名账户) createMultiSigAccount
    - [邀请辅助账户](#邀请辅助账户) inviteAccount
    - [修改辅助账户权限](#修改辅助账户权限) modifyPermissions
    - [撤销辅助账户权限](#撤销辅助账户权限) revokePermissions
@@ -69,9 +67,9 @@ Polymesh是一种使您能够在区块链上创建、发行和管理数字证券
    - [转移Polyx](#转移Polyx) transferPolyx
  - 结算
    - [添加指令](#添加指令) addInstruction
-   - 授权指令 affirmInstruction
+   - [获取指令](#获取指令) getInstruction
+   - [授权指令](#授权指令) affirmInstruction
    - [创建场地](#创建场地) createVenue
-   - 获取指令 getInstruction
    - [获取场地实例](#获取场地实例) getVenue
 
 ### 账户管理
@@ -153,7 +151,42 @@ run()
 
 #### 创建多个签名账户
 
-  - createMultiSigAccount
+需要使用一个拥有身份标识的账户替一个没有身份标识的账户进行创建。 createMultiSigAccount()
+
+```js
+import { Polymesh } from '@polymeshassociation/polymesh-sdk';
+import { LocalSigningManager } from '@polymeshassociation/local-signing-manager';
+// ......
+async function run(){
+  const signingManagerAlice = await LocalSigningManager.create({...});
+  const apiAlice = await Polymesh.connect({...});
+  const account = await apiAlice.accountManagement.getAccount({...});
+  const create =  await apiAlice.accountManagement.createMultiSigAccount({
+    requiredSignatures:new BigNumber(1),
+    signers:[account],
+  })
+  create.run()
+}
+run()
+```
+
+创建执行后，需要被创建者进行授权
+
+```js
+import { Polymesh } from '@polymeshassociation/polymesh-sdk';
+import { LocalSigningManager } from '@polymeshassociation/local-signing-manager';
+// ......
+async function run(){
+  const signingManagerAlice = await LocalSigningManager.create({...});
+  const apiAlice = await Polymesh.connect({...});
+  const signing = await apiAlice.accountManagement.getSigningAccount({...});
+  const received = await signing.authorizations.getReceived();
+  // 这里需要去查找 received 里相对应的授权请求，我这里直接取巧，选最近的的授权请求
+  const acceptQueue = await received[0].accept()
+  acceptQueue.run()
+}
+run()
+```
 
 #### 邀请辅助账户
 
@@ -876,10 +909,61 @@ import { LocalSigningManager } from '@polymeshassociation/local-signing-manager'
 async function run(){
   const signingManagerAlice = await LocalSigningManager.create({...});
   const apiAlice = await Polymesh.connect({...});
-  const venue = await apiAlice.settlements.addInstruction({
+  const identity = await apiAlice.identities.getIdentity({
+    did: '0xa39bd22fd2f078fd1c300614f564dda94a90ad3884601677fb3042b591dbede2',
+  });
+  const destinationPortfolio = await identity.portfolios.getPortfolio();
+  const venue = await this.apiAlice.settlements.getVenue({
     // 场地标识符
     id:new BigNumber(825),
   });
+  const instruction = await venue.addInstruction({
+    legs:[{
+      to: '0xa75673cc417b0d958155fde4d39309c64c2f438cec9919bda1a9242f9dda4736',
+      from: destinationPortfolio ,
+      amount: new BigNumber(100),
+      asset: 'LXB',
+    }],
+  });
+}
+run()
+```
+
+#### 获取指令
+
+获取指令实例 getInstruction()
+
+```js
+import { Polymesh,BigNumber } from '@polymeshassociation/polymesh-sdk';
+import { LocalSigningManager } from '@polymeshassociation/local-signing-manager';
+// ......
+async function run(){
+  const signingManagerAlice = await LocalSigningManager.create({...});
+  const apiAlice = await Polymesh.connect({...});
+  const instruction = await apiAlice.settlements.getInstruction({
+    // 指令标识符
+    id:new BigNumber(2867),
+  });
+}
+run()
+```
+
+#### 授权指令
+
+affirmInstruction()
+
+```js
+import { Polymesh } from '@polymeshassociation/polymesh-sdk';
+import { LocalSigningManager } from '@polymeshassociation/local-signing-manager';
+// ......
+async function run(){
+  const signingManagerAlice = await LocalSigningManager.create({...});
+  const apiAlice = await Polymesh.connect({...});
+  const affirm = await apiAlice.settlements.affirmInstruction({
+    // 指令标识符
+    id:new BigNumber(2867),
+  });
+  const venue = await affirm.run()
 }
 run()
 ```
@@ -895,13 +979,13 @@ import { LocalSigningManager } from '@polymeshassociation/local-signing-manager'
 async function run(){
   const signingManagerAlice = await LocalSigningManager.create({...});
   const apiAlice = await Polymesh.connect({...});
-  const createVenue = await apiAlice.settlements.createVenue({
+  const create = await apiAlice.settlements.createVenue({
     // 场地类型
     type:"Other",
     // 描述
     description:"这是一个实验性场所",
   });
-  const venue = await createVenue.run()
+  const venue = await create.run()
 }
 run()
 ```
@@ -924,3 +1008,5 @@ async function run(){
 }
 run()
 ```
+
+[下一个 entities](./zh/entities.md)
