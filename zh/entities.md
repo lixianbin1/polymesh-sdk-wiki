@@ -2,8 +2,6 @@
 
 主要介绍一下实体的的属性和方法
 
-[English](../en/entities.md)
-
 ## 属性与方法
 
   - 账户 Account
