@@ -6,71 +6,88 @@ Polymesh是一种使您能够在区块链上创建、发行和管理数字证券
 
 ## API目录
 
- - 账户管理
-   - [获取账户实例](#获取账户实例) getAccount
-   - [查询账户余额](#查询账户余额) getAccountBalance
-   - [查询默认签名账户](#查询默认签名账户) getSigningAccount
-   - [查询签名账户列表](#查询签名账户列表) getSigningAccounts
-   - [创建多重签名账户](#创建多重签名账户) createMultiSigAccount
-   - [邀请辅助账户](#邀请辅助账户) inviteAccount
-   - [修改辅助账户权限](#修改辅助账户权限) modifyPermissions
-   - [撤销辅助账户权限](#撤销辅助账户权限) revokePermissions
-   - [补贴辅助账户](#补贴辅助账户) subsidizeAccount
-   - [冻结辅助账户](#冻结辅助账户) freezeSecondaryAccounts
-   - [解冻辅助账户](解冻辅助账户) unfreezeSecondaryAccounts
-   - [删除辅助账户](#删除辅助账户)removeSecondaryAccounts
-   - [离开辅助账户的身份](#离开辅助账户的身份) leaveIdentity
- - 资产
-   - [获取资产实例](#获取资产实例) getAsset
-   - [查询区块链资产](#查询区块链资产) get
-   - 申领以太坊股票代码 claimClassicTicker
-   - [查询拥有资产](#查询拥有资产) getAssets 
-   - [查询预定资产](#查询预定资产) getTickerReservation
-   - [查询拥有预定资产](#查询预定资产) getTickerReservations
-   - [查询名称是否可用](#查询名称是否可用) isTickerAvailable
-   - [预定资产](#预定资产) reserveTicker
-   - [创建资产](#创建资产) createAsset
- - 声明
-   - [添加声明](#添加声明) addClaims
-   - 添加唯一性投资者声明 addInvestorUniquenessClaim
-   - 编辑声明 editClaims
-   - [获取CDD列表](#获取CDD列表) getCddClaims
-   - [获取声明范围](#获取声明范围)getClaimScopes
-   - 通过声明获得身份 getIdentitiesWithClaims
-   - 使用声明V2获取身份 getIdentitiesWithClaimsV2
-   - [唯一投资者声明列表](唯一投资者声明列表) getInvestorUniquenessClaims
-   - 查询所有声明 getIssuedClaims
-   - 查询所有声明V2 getIssuedClaimsV2
-   - 获取目标声明 getTargetingClaims
-   - 获取目标声明v2 getTargetingClaimsV2
-   - 撤销声明 revokeClaims
- - 身份
-   - [获取身份实例](#获取身份实例) getIdentity()
-   - [验证身份标识](#验证身份标识) isIdentityValid()
-   - [创建投资组合](#创建投资组合) createPortfolio()
-   - [创建多个投资组合](#创建多个投资组合) createPortfolios()
-   - 注册身份 registerIdentity()
- - 网络
-   - 按索引参数获取事件 getEventByIndexedArgs
-   - 按索引参数v2获取事件 getEventByIndexedArgsV2
-   - 按索引参数获取多个事件 getEventsByIndexedArgs
-   - 按索引参数v2获取多个事件 getEventsByIndexedArgsV2
-   - [获取最新区块编号](#获取最新区块编号) getLatestBlock
-   - [获取当前网络信息](#获取当前网络信息) getNetworkProperties
-   - [获取协议费用](#获取协议费用) getProtocolFees
-   - [检索链的SS58格式](#检索链的SS58格式) getSs58Format
-   - 通过哈希获取交易 getTransactionByHash
-   - 通过哈希v2获取交易 getTransactionByHashV2
-   - [获取财务部账户](#获取财务部账户) getTreasuryAccount
-   - [获取财务部余额](#获取财务部余额) getTreasuryBalance
-   - [获取版本](#获取版本) getVersion
-   - [转移Polyx](#转移Polyx) transferPolyx
- - 结算
-   - [添加指令](#添加指令) addInstruction
-   - [获取指令](#获取指令) getInstruction
-   - [授权指令](#授权指令) affirmInstruction
-   - [创建场地](#创建场地) createVenue
-   - [获取场地实例](#获取场地实例) getVenue
+  - 账户管理
+    - [获取账户实例](#获取账户实例) getAccount
+    - [查询账户余额](#查询账户余额) getAccountBalance
+    - [查询默认签名账户](#查询默认签名账户) getSigningAccount
+    - [查询签名账户列表](#查询签名账户列表) getSigningAccounts
+    - [创建多重签名账户](#创建多重签名账户) createMultiSigAccount
+    - [邀请辅助账户](#邀请辅助账户) inviteAccount
+    - [修改辅助账户权限](#修改辅助账户权限) modifyPermissions
+    - [撤销辅助账户权限](#撤销辅助账户权限) revokePermissions
+    - [补贴辅助账户](#补贴辅助账户) subsidizeAccount
+    - [冻结辅助账户](#冻结辅助账户) freezeSecondaryAccounts
+    - [解冻辅助账户](解冻辅助账户) unfreezeSecondaryAccounts
+    - [删除辅助账户](#删除辅助账户)removeSecondaryAccounts
+    - [离开辅助账户的身份](#离开辅助账户的身份) leaveIdentity
+  - 资产
+    - [获取资产实例](#获取资产实例) getAsset
+    - [查询区块链资产](#查询区块链资产) get
+    - 申领以太坊股票代码 claimClassicTicker
+    - [查询拥有资产](#查询拥有资产) getAssets 
+    - [查询预定资产](#查询预定资产) getTickerReservation
+    - [查询拥有预定资产](#查询预定资产) getTickerReservations
+    - [查询名称是否可用](#查询名称是否可用) isTickerAvailable
+    - [预定资产](#预定资产) reserveTicker
+    - [创建资产](#创建资产) createAsset
+  - 声明
+    - [添加声明](#添加声明) addClaims
+    - 添加唯一性投资者声明 addInvestorUniquenessClaim
+    - 编辑声明 editClaims
+    - [获取CDD列表](#获取CDD列表) getCddClaims
+    - [获取声明范围](#获取声明范围)getClaimScopes
+    - 通过声明获得身份 getIdentitiesWithClaims
+    - 使用声明V2获取身份 getIdentitiesWithClaimsV2
+    - [唯一投资者声明列表](唯一投资者声明列表) getInvestorUniquenessClaims
+    - 查询所有声明 getIssuedClaims
+    - 查询所有声明V2 getIssuedClaimsV2
+    - 获取目标声明 getTargetingClaims
+    - 获取目标声明v2 getTargetingClaimsV2
+    - 撤销声明 revokeClaims
+  - 身份
+    - [获取身份实例](#获取身份实例) getIdentity()
+    - [验证身份标识](#验证身份标识) isIdentityValid()
+    - [创建投资组合](#创建投资组合) createPortfolio()
+    - [创建多个投资组合](#创建多个投资组合) createPortfolios()
+    - 注册身份 registerIdentity()
+  - 网络
+    - 按索引参数获取事件 getEventByIndexedArgs
+    - 按索引参数v2获取事件 getEventByIndexedArgsV2
+    - 按索引参数获取多个事件 getEventsByIndexedArgs
+    - 按索引参数v2获取多个事件 getEventsByIndexedArgsV2
+    - [获取最新区块编号](#获取最新区块编号) getLatestBlock
+    - [获取当前网络信息](#获取当前网络信息) getNetworkProperties
+    - [获取协议费用](#获取协议费用) getProtocolFees
+    - [检索链的SS58格式](#检索链的SS58格式) getSs58Format
+    - 通过哈希获取交易 getTransactionByHash
+    - 通过哈希v2获取交易 getTransactionByHashV2
+    - [获取财务部账户](#获取财务部账户) getTreasuryAccount
+    - [获取财务部余额](#获取财务部余额) getTreasuryBalance
+    - [获取版本](#获取版本) getVersion
+    - [转移Polyx](#转移Polyx) transferPolyx
+  - 结算
+    - [添加指令](#添加指令) addInstruction
+    - [获取指令](#获取指令) getInstruction
+    - [授权指令](#授权指令) affirmInstruction
+    - [创建场地](#创建场地) createVenue
+    - [获取场地实例](#获取场地实例) getVenue 
+
+  - Polymesh
+    - [accountManagement](./zh/entities.md#accountManagement)
+    - [assets](./zh/entities.md#accountManagement)
+    - [claims](./zh/entities.md#accountManagement)
+    - [identities](./zh/entities.md#accountManagement)
+    - [network](./zh/entities.md#accountManagement)
+    - [settlements](./zh/entities.md#accountManagement)
+    - [创建交易批处理](#创建交易批处理) createTransactionBatch()
+    - [断开所有链接](#断开所有链接) disconnect()
+    - [查看签名账户标识](#查看签名账户标识) getSigningIdentity()
+    - [处理连接错误](#处理连接错误) onConnectionError()
+    - [断开链接事件](#断开链接事件) onDisconnect()
+    - [设置签名账户](#设置签名账户) setSigningAccount()
+    - [设置签名管理器](#设置签名管理器) setSigningManager()
+    - [创建实例](#创建实例) connect()
+
 
 ### 账户管理
 
@@ -85,8 +102,15 @@ import { Polymesh } from '@polymeshassociation/polymesh-sdk';
 import { LocalSigningManager } from '@polymeshassociation/local-signing-manager';
 // ......
 async function run(){
-  const signingManagerAlice = await LocalSigningManager.create({...});
-  const apiAlice = await Polymesh.connect({...});
+  const signingManagerAlice = await LocalSigningManager.create({
+    accounts: [
+      {'mnemonic':'model smooth maid whale private around elite spice setup mushroom merit yellow'},
+    ],
+  });
+  const apiAlice = await Polymesh.connect({
+    nodeUrl: 'wss://testnet-rpc.polymesh.live',
+    signingManager,
+  });
   const account = await apiAlice.accountManagement.getAccount({
     // 地址为必选参数
     address:'5CK7bPZJrCXAVTs1RznLee5ZcecQTbKopS92yzPF8SS2r7mH'
@@ -149,7 +173,7 @@ async function run(){
 run()
 ```
 
-#### 创建多个签名账户
+#### 创建多重签名账户
 
 需要使用一个拥有身份标识的账户替一个没有身份标识的账户进行创建。 createMultiSigAccount()
 
@@ -435,7 +459,7 @@ run()
 
 claimClassicTicker()
 
-#### 查询资产
+#### 查询拥有资产
 
 获取身份标识拥有的发行资产 getAssets()
 
@@ -980,7 +1004,7 @@ async function run(){
   const signingManagerAlice = await LocalSigningManager.create({...});
   const apiAlice = await Polymesh.connect({...});
   const create = await apiAlice.settlements.createVenue({
-    // 场地类型
+    // 场地类型 分配:Distribution 置换:Exchange 其他:Other 发行/筹款:Sto
     type:"Other",
     // 描述
     description:"这是一个实验性场所",
@@ -1008,5 +1032,163 @@ async function run(){
 }
 run()
 ```
+
+### Polymesh
+
+#### 创建交易批处理
+
+从单独交易记录列表创建批处理事务。该列表也可以包含批处理事务。  createTransactionBatch()
+
+```js
+import { Polymesh,BigNumber } from '@polymeshassociation/polymesh-sdk';
+import { LocalSigningManager } from '@polymeshassociation/local-signing-manager';
+// ......
+async function run(){
+  const signingManagerAlice = await LocalSigningManager.create({...});
+  const apiAlice = await Polymesh.connect({...});
+  // 预定3资产
+  const tx1 = await apiAlice.assets.reserveTicker({ ticker: 'FOO' });
+  const tx2 = await apiAlice.assets.reserveTicker({ ticker: 'BAR' });
+  const tx3 = await apiAlice.assets.reserveTicker({ ticker: 'BAZ' });
+  const batch = apiAlice.createTransactionBatch(
+    {
+      // 交易列表
+      transactions:[tx1, tx2, tx3] as const
+    },
+    // 指定签名账户
+    { signingAccount: 'someAddress' }
+  );
+  const [res1, res2, res3] = await batch.run();
+}
+run()
+```
+
+#### 断开所有链接
+
+断开客户端连接并关闭所有打开的连接和订阅 disconnect()
+
+```js
+import { Polymesh,BigNumber } from '@polymeshassociation/polymesh-sdk';
+import { LocalSigningManager } from '@polymeshassociation/local-signing-manager';
+// ......
+async function run(){
+  const signingManagerAlice = await LocalSigningManager.create({...});
+  const apiAlice = await Polymesh.connect({...});
+  const disconnect = await apiAlice.disconnect();
+}
+run()
+```
+
+#### 查看签名账户标识
+
+检索查看与签名帐户关联的身份标识 getSigningIdentity()
+
+```js
+import { Polymesh,BigNumber } from '@polymeshassociation/polymesh-sdk';
+import { LocalSigningManager } from '@polymeshassociation/local-signing-manager';
+// ......
+async function run(){
+  const signingManagerAlice = await LocalSigningManager.create({...});
+  const apiAlice = await Polymesh.connect({...});
+  const identity = await apiAlice.getSigningIdentity();
+}
+run()
+```
+
+#### 处理连接错误
+
+处理链接错误 onConnectionError()
+
+```js
+import { Polymesh,BigNumber } from '@polymeshassociation/polymesh-sdk';
+import { LocalSigningManager } from '@polymeshassociation/local-signing-manager';
+// ......
+async function run(){
+  const signingManagerAlice = await LocalSigningManager.create({...});
+  const apiAlice = await Polymesh.connect({...});
+  // 处理订阅连接错误 订阅回调
+  this.apiAlice.onConnectionError((err)=>{
+    console.log(err)
+  });
+  await this.apiAlice.disconnect();
+  console.log('断开链接')
+}
+run()
+```
+
+#### 断开链接事件
+
+处理断开链接回调 onDisconnect()
+
+```js
+import { Polymesh,BigNumber } from '@polymeshassociation/polymesh-sdk';
+import { LocalSigningManager } from '@polymeshassociation/local-signing-manager';
+// ......
+async function run(){
+  const signingManagerAlice = await LocalSigningManager.create({...});
+  const apiAlice = await Polymesh.connect({...});
+  // 处理断开 订阅回调
+  this.apiAlice.onDisconnect((err)=>{
+    console.log(err)
+  });
+  await this.apiAlice.disconnect();
+  console.log('断开链接')
+}
+run()
+```
+
+#### 设置签名账户
+
+将 SDK 的签名帐户设置为提供的帐户，需要签名管理器且传递的帐户需要在签名管理器中 setSigningAccount()
+
+```js
+import { Polymesh,BigNumber } from '@polymeshassociation/polymesh-sdk';
+import { LocalSigningManager } from '@polymeshassociation/local-signing-manager';
+// ......
+async function run(){
+  const signingManagerAlice = await LocalSigningManager.create({...});
+  const apiAlice = await Polymesh.connect({...});
+  const account = await apiAlice.getAccount({...})
+  await apiAlice.setSigningAccount(account);
+}
+run()
+```
+
+#### 设置签名管理器
+
+将 SDK 的签名管理器设置为提供的签名管理器 setSigningManager()
+
+```js
+import { Polymesh,BigNumber } from '@polymeshassociation/polymesh-sdk';
+import { LocalSigningManager } from '@polymeshassociation/local-signing-manager';
+import { BrowserExtensionSigningManager } from '@polymeshassociation/browser-extension-signing-manager';
+// ......
+async function run(){
+  const signingManagerAlice = await LocalSigningManager.create({...});
+  const apiAlice = await Polymesh.connect({...});
+  const signingManager = await BrowserExtensionSigningManager.create({
+    appName:'polymesh-vue',
+    extensionName: 'polywallet',
+  });
+  await apiAlice.setSigningManager(signingManager);
+}
+run()
+```
+
+#### 创建实例
+
+创建SDK实例并连接到Polymesh节点 connect()
+
+```js
+import { Polymesh,BigNumber } from '@polymeshassociation/polymesh-sdk';
+import { LocalSigningManager } from '@polymeshassociation/local-signing-manager';
+// ......
+async function run(){
+  const signingManagerAlice = await LocalSigningManager.create({...});
+  const apiAlice = await Polymesh.connect({...});
+}
+run()
+```
+
 
 [下一个 entities](./zh/entities.md)

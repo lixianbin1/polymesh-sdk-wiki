@@ -4,7 +4,7 @@
 
 ## 属性与方法
 
-  - 账户 Account
+  - 账户 [Account](#Account)
     - 地址 address :`Polymesh`账户的特定地址，当作标识符
     - 授权 authorizations
       - [查询单个授权](#查询单个授权) getOne()
@@ -73,7 +73,7 @@
       - 查找所有文档 get()
       - 设置文档列表 set()
     - 发行 issuance
-      - 发行 issue()
+      - [发行铸币](#发行铸币) issue()
     - 产品 offerings
       - 查询所有产品 get()
       - 查询单个产品 getOne()
@@ -124,7 +124,7 @@
   - 创建数据 createdAt()
   - 创建数据V2 createdAtV2()
   - 资金融资回合 currentFundingRound()
-  - 资产数据 details()
+  - [资产数据](#资产数据) details()
   - 是否存在 exists()
   - 冻结资产 freeze()
   - 获取标识符列表 getIdentifiers()
@@ -200,6 +200,10 @@
     - 身份授权 authorizations
     - 身份ID did
     - 投资组合 portfolios
+      - delete()
+      - getCustodiedPortfolios()
+      - [获取投资组合](#获取投资组合) getPortfolio()
+      - [获取拥有投资组合](#获取拥有投资组合) getPortfolios()
     - 标识 uuid :由标识转为的`uuid`,继承于实体Entity
     - 检查辅助账户是否冻结 areSecondaryAccountsFrozen()
     - 检查是否拥有指定角色 checkRoles()
@@ -207,7 +211,7 @@
     - 查看余额 getAssetBalance()
     - 查看资产列表 getHeldAssets()
     - 查看资产列表V2 getHeldAssetsV2()
-    - 获取所有指令 getInstructions()
+    - [获取所有指令](获取所有指令) getInstructions()
     - 查看未支付的股息分配 getPendingDistributions()
     - 查看待处理的指令 getPendingInstructions()
     - 查看主账户 getPrimaryAccount()
@@ -215,7 +219,7 @@
     - 获取辅助账户 getSecondaryAccounts()
     - 获取信任资产 getTrustingAssets()
     - 获取信任资产V2 getTrustingAssetsV2()
-    - 查看场地 getVenues()
+    - [查看拥有场地](#查看拥有场地) getVenues()
     - 是否拥有角色 hasRole()
     - 是否拥有所有角色 hasRoles()
     - 是否有CDD hasValidCdd()
@@ -249,7 +253,21 @@
   - 已知权限组 KnownPermissionGroup
 
   - 场地 Venue
+    - 场地ID id :场地标识符编号 
+    - 标识 uuid :由标识转为的`uuid`,继承于实体Entity
+    - [添加结算指令](#添加结算指令) addDirective()
+    - addInstructions
+    - [查看场地详情](#查看场地详情)details
+    - exists
+    - [获取场地指令](#获取场地指令) getInstructions()
+    - getPendingInstructions
+    - isEqual
+    - modify
+    - [人类可读](#Venue.toHuman) toHuman()
+    - generateUuid
+    - unserialize
 
+## Account
 
 ### 查询单个授权
 
@@ -536,7 +554,7 @@ run()
 
 #### 查询持有人资产
 
-查询资产所有的持有人的资产持有余额
+查询资产的所有的持有人的资产持有余额
 
 ```js
 import { Polymesh } from '@polymeshassociation/polymesh-sdk';
@@ -545,8 +563,8 @@ import { LocalSigningManager } from '@polymeshassociation/local-signing-manager'
 async function run(){
   const signingManagerAlice = await LocalSigningManager.create({...});
   const apiAlice = await Polymesh.connect({...});
-  const account = await apiAlice.accountManagement.getSigningAccount();
-  const address = await account.toHuman()
+  const asset = await apiAlice.assets.getAsset({ticker:'LXB'});
+  const address = await asset.assetHolders.get()
 }
 run()
 ```
@@ -557,14 +575,187 @@ run()
 
 #### 获取单独快照
 
+#### 发行铸币
+
+给指定的资产发行代币
+
+```js
+import { Polymesh } from '@polymeshassociation/polymesh-sdk';
+import { LocalSigningManager } from '@polymeshassociation/local-signing-manager';
+// ......
+async function run(){
+  const signingManagerAlice = await LocalSigningManager.create({...});
+  const apiAlice = await Polymesh.connect({...});
+  const asset = await apiAlice.assets.getAsset({ticker:'LXB'});
+  const address = await assets.issuance.issue({
+    // amount:需要发行的代币数量
+    amount:new BigNumber(100)
+  })
+}
+run()
+```
+
 #### 控制转移
 
 从给定投资组合转移到目的者的默认投资组合 controllerTransfer()
+
+
+### 资产数据
+
+查看资产的一些数据
+
+```js
+import { Polymesh } from '@polymeshassociation/polymesh-sdk';
+import { LocalSigningManager } from '@polymeshassociation/local-signing-manager';
+// ......
+async function run(){
+  const signingManagerAlice = await LocalSigningManager.create({...});
+  const apiAlice = await Polymesh.connect({...});
+  const asset = await apiAlice.assets.getAsset({ticker:'LXB'});
+  const details = await assets.details()
+}
+run()
+```
 
 #### 创建数据
 
 检索创建令牌时发出的事件的标识符数据（块号、日期和事件索引） createdAt()
 
+#### 获取投资组合
 
+根据ID获取投资组合实体 getPortfolio()
+
+```js
+import { Polymesh } from '@polymeshassociation/polymesh-sdk';
+import { LocalSigningManager } from '@polymeshassociation/local-signing-manager';
+// ......
+async function run(){
+  const signingManagerAlice = await LocalSigningManager.create({...});
+  const apiAlice = await Polymesh.connect({...});
+  const Signing =  await apiAlice.accountManagement.getSigningAccount()
+  const identity = await Signing.getIdentity()
+  const portfolioses = await identity.portfolios.getPortfolio({
+    // portfolioId:投资组合ID，如不传则为默认投资组合
+    portfolioId:new BigNumber(3)
+  })
+}
+run()
+```
+
+#### 获取拥有投资组合
+
+获取该身份的投资组合 getPortfolios()
+
+```js
+import { Polymesh } from '@polymeshassociation/polymesh-sdk';
+import { LocalSigningManager } from '@polymeshassociation/local-signing-manager';
+// ......
+async function run(){
+  const signingManagerAlice = await LocalSigningManager.create({...});
+  const apiAlice = await Polymesh.connect({...});
+  const Signing =  await apiAlice.accountManagement.getSigningAccount()
+  const identity = await Signing.getIdentity()
+  const portfolioses = await identity.portfolios.getPortfolios()
+}
+run()
+```
+
+#### 查看拥有场地
+
+查看当前身份拥有场地 getVenues()
+
+```js
+import { Polymesh } from '@polymeshassociation/polymesh-sdk';
+import { LocalSigningManager } from '@polymeshassociation/local-signing-manager';
+// ......
+async function run(){
+  const signingManagerAlice = await LocalSigningManager.create({...});
+  const apiAlice = await Polymesh.connect({...});
+  const Signing =  await apiAlice.accountManagement.getSigningAccount()
+  const identity = await Signing.getIdentity()
+  const portfolioses = await identity.getVenues()()
+}
+run()
+```
+
+#### 添加结算指令
+
+添加结算指令 addDirective()
+
+```js
+import { Polymesh } from '@polymeshassociation/polymesh-sdk';
+import { LocalSigningManager } from '@polymeshassociation/local-signing-manager';
+// ......
+async function run(){
+  const signingManagerAlice = await LocalSigningManager.create({...});
+  const apiAlice = await Polymesh.connect({...});
+  const venue = await this.apiAlice.settlements.getVenue({...});
+  // 投资组合
+  const portfolio = await identity.portfolios.getPortfolio()
+  const details = await venue.addDirective({
+    legs:[{
+      // to:接受人的did
+      to: '0x56fffe845776656af85d0dac519abb073ca4073228ed9207588407bc9704d9b0',
+      from: portfolio,
+      // 数量
+      amount: new BigNumber(100),
+      // 资产代币
+      asset: 'LXB',
+    }],
+  })
+}
+run()
+```
+
+#### 查看场地详情
+
+查看场地的详情 details()
+
+```js
+import { Polymesh } from '@polymeshassociation/polymesh-sdk';
+import { LocalSigningManager } from '@polymeshassociation/local-signing-manager';
+// ......
+async function run(){
+  const signingManagerAlice = await LocalSigningManager.create({...});
+  const apiAlice = await Polymesh.connect({...});
+  const venue = await this.apiAlice.settlements.getVenue({...});
+  const details = await venue.details()
+}
+run()
+```
+
+#### 获取场地指令
+
+获取场地的所有指令 getInstructions()
+
+```js
+import { Polymesh } from '@polymeshassociation/polymesh-sdk';
+import { LocalSigningManager } from '@polymeshassociation/local-signing-manager';
+// ......
+async function run(){
+  const signingManagerAlice = await LocalSigningManager.create({...});
+  const apiAlice = await Polymesh.connect({...});
+  const venue = await this.apiAlice.settlements.getVenue({...});
+  const instructions = await venue.getInstructions()
+}
+run()
+```
+
+#### Venue.toHuman
+
+人类可读
+
+```js
+import { Polymesh } from '@polymeshassociation/polymesh-sdk';
+import { LocalSigningManager } from '@polymeshassociation/local-signing-manager';
+// ......
+async function run(){
+  const signingManagerAlice = await LocalSigningManager.create({...});
+  const apiAlice = await Polymesh.connect({...});
+  const venue = await this.apiAlice.settlements.getVenue({...});
+  const instructions = await venue.toHuman()
+}
+run()
+```
 
 [下一个 entities]
