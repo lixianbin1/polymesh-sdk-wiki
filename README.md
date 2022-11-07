@@ -6,7 +6,7 @@ Polymesh是一种使您能够在区块链上创建、发行和管理数字证券
 
 ## API目录
 
-  - 账户管理
+  - [账户管理](#账户管理)
     - [获取账户实例](#获取账户实例) getAccount
     - [查询账户余额](#查询账户余额) getAccountBalance
     - [查询默认签名账户](#查询默认签名账户) getSigningAccount
@@ -20,7 +20,7 @@ Polymesh是一种使您能够在区块链上创建、发行和管理数字证券
     - [解冻辅助账户](解冻辅助账户) unfreezeSecondaryAccounts
     - [删除辅助账户](#删除辅助账户)removeSecondaryAccounts
     - [离开辅助账户的身份](#离开辅助账户的身份) leaveIdentity
-  - 资产
+  - [资产](#资产)
     - [获取资产实例](#获取资产实例) getAsset
     - [查询区块链资产](#查询区块链资产) get
     - 申领以太坊股票代码 claimClassicTicker
@@ -30,7 +30,7 @@ Polymesh是一种使您能够在区块链上创建、发行和管理数字证券
     - [查询名称是否可用](#查询名称是否可用) isTickerAvailable
     - [预定资产](#预定资产) reserveTicker
     - [创建资产](#创建资产) createAsset
-  - 声明
+  - [声明](#声明)
     - [添加声明](#添加声明) addClaims
     - 添加唯一性投资者声明 addInvestorUniquenessClaim
     - 编辑声明 editClaims
@@ -44,13 +44,13 @@ Polymesh是一种使您能够在区块链上创建、发行和管理数字证券
     - 获取目标声明 getTargetingClaims
     - 获取目标声明v2 getTargetingClaimsV2
     - 撤销声明 revokeClaims
-  - 身份
+  - [身份](#身份)
     - [获取身份实例](#获取身份实例) getIdentity()
     - [验证身份标识](#验证身份标识) isIdentityValid()
     - [创建投资组合](#创建投资组合) createPortfolio()
     - [创建多个投资组合](#创建多个投资组合) createPortfolios()
     - 注册身份 registerIdentity()
-  - 网络
+  - [网络](#网络)
     - 按索引参数获取事件 getEventByIndexedArgs
     - 按索引参数v2获取事件 getEventByIndexedArgsV2
     - 按索引参数获取多个事件 getEventsByIndexedArgs
@@ -65,20 +65,20 @@ Polymesh是一种使您能够在区块链上创建、发行和管理数字证券
     - [获取财务部余额](#获取财务部余额) getTreasuryBalance
     - [获取版本](#获取版本) getVersion
     - [转移Polyx](#转移Polyx) transferPolyx
-  - 结算
+  - [结算](#结算)
     - [添加指令](#添加指令) addInstruction
     - [获取指令](#获取指令) getInstruction
     - [授权指令](#授权指令) affirmInstruction
     - [创建场地](#创建场地) createVenue
     - [获取场地实例](#获取场地实例) getVenue 
 
-  - Polymesh
-    - [accountManagement](./zh/entities.md#accountManagement)
-    - [assets](./zh/entities.md#accountManagement)
-    - [claims](./zh/entities.md#accountManagement)
-    - [identities](./zh/entities.md#accountManagement)
-    - [network](./zh/entities.md#accountManagement)
-    - [settlements](./zh/entities.md#accountManagement)
+  - [Polymesh](#Polymesh)
+    - 账户管理 accountManagement
+    - 资产 assets
+    - 声明 claims
+    - 身份 identities
+    - 网络 network
+    - 结算 settlements
     - [创建交易批处理](#创建交易批处理) createTransactionBatch()
     - [断开所有链接](#断开所有链接) disconnect()
     - [查看签名账户标识](#查看签名账户标识) getSigningIdentity()

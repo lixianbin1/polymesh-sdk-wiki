@@ -554,7 +554,7 @@ run()
 
 #### 查询持有人资产
 
-查询资产的所有的持有人的资产持有余额
+查询资产的所有的持有人的资产持有余额 get()
 
 ```js
 import { Polymesh } from '@polymeshassociation/polymesh-sdk';
@@ -570,6 +570,8 @@ run()
 ```
 
 #### 创建快照
+
+
 
 #### 获取所有快照
 
