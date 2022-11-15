@@ -32,14 +32,14 @@ Polymesh是一种使您能够在区块链上创建、发行和管理数字证券
     - [创建资产](#创建资产) createAsset
   - [声明](#声明)
     - [添加声明](#添加声明) addClaims
-    - 添加唯一性投资者声明 addInvestorUniquenessClaim
-    - 编辑声明 editClaims
+    - [添加唯一性投资者声明](#添加唯一性投资者声明) addInvestorUniquenessClaim
+    - [编辑声明](#编辑声明) editClaims
     - [获取CDD列表](#获取CDD列表) getCddClaims
     - [获取声明范围](#获取声明范围)getClaimScopes
     - 通过声明获得身份 getIdentitiesWithClaims
     - 使用声明V2获取身份 getIdentitiesWithClaimsV2
-    - [唯一投资者声明列表](唯一投资者声明列表) getInvestorUniquenessClaims
-    - 查询所有声明 getIssuedClaims
+    - [唯一投资者声明列表](#唯一投资者声明列表) getInvestorUniquenessClaims
+    - [查询所有声明](#查询所有声明) getIssuedClaims
     - 查询所有声明V2 getIssuedClaimsV2
     - 获取目标声明 getTargetingClaims
     - 获取目标声明v2 getTargetingClaimsV2
@@ -349,10 +349,7 @@ async function run(){
   const signingManagerAlice = await LocalSigningManager.create({...});
   const apiAlice = await Polymesh.connect({...});
   const account = await apiAlice.accountManagement.getAccount({...});
-  const remove = await apiAlice.accountManagement.freezeSecondaryAccounts({
-    // 可选参数：被删除的指定账户，可以是多个
-    accounts:[account],
-  });
+  const remove = await apiAlice.accountManagement.freezeSecondaryAccounts();
   remove.run()
 }
 run()
@@ -616,7 +613,75 @@ async function run(){
 run()
 ```
 
+#### 添加唯一性投资者声明
 
+添加唯一性投资者声明 addInvestorUniquenessClaim()
+
+```js
+import { Polymesh } from '@polymeshassociation/polymesh-sdk';
+import { LocalSigningManager } from '@polymeshassociation/local-signing-manager';
+import { ClaimType, ScopeType } from '@polymeshassociation/polymesh-sdk/types';
+// ......
+async function run(){
+  const signingManagerAlice = await LocalSigningManager.create({...});
+  const apiAlice = await Polymesh.connect({...});
+  const uIDv4 = "21d18606-5971-4136-90c1-decdef95fc1e"; // 投资者UID
+  const uID = `0x${uIDv4.replace(/-/g, '')}`;
+  const iuProofAsString = confidential_identity.process_create_claim_proof(
+    JSON.stringify({
+      "investor_did": Array.from(hexToU8a(identity.did)),
+      "investor_unique_id": Array.from(hexToU8a(uID))
+    }),
+    JSON.stringify({
+      "scope_did": Array.from(hexToU8a(acmeScopeDid)),
+      "investor_unique_id": Array.from(hexToU8a(uID))
+    })
+  );
+  const iuProof = JSON.parse(iuProofAsString);
+  const proof = `0x${createHexString(iuProof.proof)}`;
+  const scopeId = `0x${createHexString(iuProof.scope_id)}`;
+  const acmeCddClaims = await apiAlice.claims.getCddClaims({
+    "includeExpired": false
+  });
+  assert(acmeCddClaims.length > 0);
+  const acmeCddClaim = acmeCddClaims[0].claim;  
+
+  const claims = await apiAlice.claims.addInvestorUniquenessClaim({
+    // 声明
+    cddId: acmeCddClaim.id,, // CDD 的ID
+    expiry:new Date('2022-11-15 12:00'), //可选：过期时间
+    proof: proof, // 证明
+    scope:{
+      type:"Ticker", // Custom Identity Ticker
+      value:"LXB"
+    },
+    scopeId: scopeId,
+  })
+  claims.run()
+}
+run()
+```
+
+#### 编辑声明
+
+编辑与身份关联的声明（只能修改到期日期） editClaims()
+
+```js
+import { Polymesh } from '@polymeshassociation/polymesh-sdk';
+import { LocalSigningManager } from '@polymeshassociation/local-signing-manager';
+// ......
+async function run(){
+  const signingManagerAlice = await LocalSigningManager.create({...});
+  const apiAlice = await Polymesh.connect({...});
+  const claimsList = await apiAlice.claims.getCddClaims();
+  claimsList[0].expiry = new Date('2022-11-15 12:00')
+  const editClaims = await apiAlice.claims.editClaims({
+    claims:claimsList,
+    operation:"Edit"
+  });
+}
+run()
+```
 
 #### 获取CDD列表
 
@@ -629,11 +694,7 @@ import { LocalSigningManager } from '@polymeshassociation/local-signing-manager'
 async function run(){
   const signingManagerAlice = await LocalSigningManager.create({...});
   const apiAlice = await Polymesh.connect({...});
-  const cddList = await apiAlice.claims.getCddClaims({
-    // 可选参数，默认为当前账号 target
-    target: '0xa39bd22fd2f078fd1c300614f564dda94a90ad3884601677fb3042b591dbede2',
-  });
-
+  const claimsList = await apiAlice.claims.getCddClaims();
 }
 run()
 ```
@@ -659,7 +720,7 @@ run()
 
 #### 唯一投资者声明列表
 
-检索目标身份的投资者唯一性声明列表 getInvestorUniquenessClaims
+检索目标身份的投资者唯一性声明列表 getInvestorUniquenessClaims()
 
 ```js
 import { Polymesh } from '@polymeshassociation/polymesh-sdk';
@@ -675,7 +736,27 @@ async function run(){
 run()
 ```
 
+#### 查询所有声明
 
+查询账户标识的所有声明，需要中间件 getIssuedClaims()
+
+```js
+import { Polymesh } from '@polymeshassociation/polymesh-sdk';
+import { LocalSigningManager } from '@polymeshassociation/local-signing-manager';
+// ......
+async function run(){
+  const signingManagerAlice = await LocalSigningManager.create({...});
+  const apiAlice = await Polymesh.connect({...});
+  const scopes = await apiAlice.claims.getIssuedClaims({
+    // 可选参数
+    includeExpired:true, //是否包含过期声明
+    size:10, //分页数
+    start:1, //当前页数
+    target:'0xa39bd22fd2f078fd1c300614f564dda94a90ad3884601677fb3042b591dbede2' //身份标识
+  });
+}
+run()
+```
 
 ### 身份
 
@@ -936,18 +1017,16 @@ async function run(){
   const identity = await apiAlice.identities.getIdentity({
     did: '0xa39bd22fd2f078fd1c300614f564dda94a90ad3884601677fb3042b591dbede2',
   });
-  const destinationPortfolio = await identity.portfolios.getPortfolio();
-  const venue = await this.apiAlice.settlements.getVenue({
-    // 场地标识符
-    id:new BigNumber(825),
-  });
-  const instruction = await venue.addInstruction({
+  const portfolio = await identity.portfolios.getPortfolio();
+  const instruction = await apiAlice.settlements.addInstruction({
     legs:[{
-      to: '0xa75673cc417b0d958155fde4d39309c64c2f438cec9919bda1a9242f9dda4736',
-      from: destinationPortfolio ,
-      amount: new BigNumber(100),
-      asset: 'LXB',
+      amount:new BigNumber(100),
+      asset:'LXB',
+      from:portfolio,
+      to: '0xa75673cc417b0d958155fde4d39309c64c2f438cec9919bda1a9242f9dda4736'
     }],
+    memo:"备注",
+    venueId:new BigNumber(797)
   });
 }
 run()
