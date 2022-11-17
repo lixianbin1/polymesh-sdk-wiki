@@ -82,12 +82,12 @@
       - 创建权限组 createGroup
       - 查询代理权限组 getAgents
       - 查询单个权限组 getGroup
-      - 查询所有权限组 getGroups
-      - 邀请代理 inviteAgent
+      - [查询所有权限组](#查询所有权限组) getGroups()
+      - [邀请代理](#邀请代理) inviteAgent()
       - 删除代理 removeAgent
     - 结算 settlements
-      - 是否可转让代币 canSettle()
-      - 是否可转让资产 canTransfer()
+      - [是否可转让代币](#是否可转让代币) canSettle()
+      - [是否可转让资产](#是否可转让资产) canTransfer()
     - 股票 ticker :资产的股票代码
     - 转移限制 transferRestrictions
       - 声明持有总数限制 claimCount
@@ -200,7 +200,7 @@
     - 身份授权 authorizations
       - [查询单个授权](#Identity.getOne) getOne
       - getReceived
-      - getSent
+      - [查询发送请求](#查询发送请求) getSent
     - 身份ID did
     - 投资组合 portfolios
       - delete()
@@ -871,6 +871,99 @@ async function run(){
 run()
 ```
 
+#### 查询所有权限组
+
+检索此资产的所有权限组 getGroups
+
+```js
+import { Polymesh } from '@polymeshassociation/polymesh-sdk';
+import { LocalSigningManager } from '@polymeshassociation/local-signing-manager';
+// ......
+async function run(){
+  const signingManagerAlice = await LocalSigningManager.create({...});
+  const apiAlice = await Polymesh.connect({...});
+  const assets = await apiAlice.assets.getAsset({ticker:'LXB'});
+  const groups = await assets.permissions.getGroups()
+}
+run()
+```
+
+
+#### 邀请代理
+
+邀请身份成为对此资产具有权限的代理 inviteAgent()
+
+```js
+import { Polymesh } from '@polymeshassociation/polymesh-sdk';
+import { LocalSigningManager } from '@polymeshassociation/local-signing-manager';
+// ......
+async function run(){
+  const signingManagerAlice = await LocalSigningManager.create({...});
+  const apiAlice = await Polymesh.connect({...});
+  const assets = await apiAlice.assets.getAsset({ticker:'LXB'});
+  const groups = await assets.permissions.getGroups()
+  const invite = await assets.permissions.inviteAgent({
+    // 可选:过期时间，不设置则永不过期 
+    // expiry:null,
+    // 必选:权限组
+    permissions:groups.known[0],
+    target:'0xa75673cc417b0d958155fde4d39309c64c2f438cec9919bda1a9242f9dda4736',
+  })
+  await invite.run()
+}
+run()
+```
+
+#### 是否可转让代币
+
+检查是否可以创建结算指令，以便在两个投资组合之间转移一定数量的该资产代币 canSettle()
+
+```js
+import { Polymesh } from '@polymeshassociation/polymesh-sdk';
+import { LocalSigningManager } from '@polymeshassociation/local-signing-manager';
+// ......
+async function run(){
+  const signingManagerAlice = await LocalSigningManager.create({...});
+  const Signing =  await apiAlice.accountManagement.getSigningAccount()
+  const identity = await Signing.getIdentity()
+  const portfolio = await identity.portfolios.getPortfolio()
+  const portfolio2 = await identity2.portfolios.getPortfolio({...})
+  const apiAlice = await Polymesh.connect({...});
+  const asset = await apiAlice.assets.getAsset({ticker:'LXB'});
+  const settle = asset.settlements.canSettle({
+    amount:new BigNumber(100),
+    from:portfolio, //可选参数：默认为当前签名账户的默认投资组合
+    to:portfolio2
+  })
+}
+run()
+```
+
+#### 是否可转让资产
+
+检查是否可以创建结算指令，以便在两个投资组合之间转移一定数量的该资产代币，返回包含一般错误（如余额不足或收款人无效）、任何违反的转账限制以及任何合规性失败的事务明细 canTransfer()
+
+```js
+import { Polymesh } from '@polymeshassociation/polymesh-sdk';
+import { LocalSigningManager } from '@polymeshassociation/local-signing-manager';
+// ......
+async function run(){
+  const signingManagerAlice = await LocalSigningManager.create({...});
+  const Signing =  await apiAlice.accountManagement.getSigningAccount()
+  const identity = await Signing.getIdentity()
+  const portfolio = await identity.portfolios.getPortfolio()
+  const portfolio2 = await identity2.portfolios.getPortfolio({...})
+  const apiAlice = await Polymesh.connect({...});
+  const asset = await apiAlice.assets.getAsset({ticker:'LXB'});
+  const settle = asset.settlements.canTransfer({
+    amount:new BigNumber(100),
+    from:portfolio, //可选参数：默认为当前签名账户的默认投资组合
+    to:portfolio2
+  })
+}
+run()
+```
+
 #### 控制转移
 
 从给定投资组合转移到目的者的默认投资组合 controllerTransfer()
@@ -883,6 +976,7 @@ async function run(){
   const signingManagerAlice = await LocalSigningManager.create({...});
   const apiAlice = await Polymesh.connect({...});
   const asset = await apiAlice.assets.getAsset({ticker:'LXB'});
+  const identity = await Signing.getIdentity()
   const portfolio = await identity.portfolios.getPortfolio({id:new BigNumber(21)})
   const controller = await assets.controllerTransfer({
     amount:new BigNumber(100),
@@ -937,7 +1031,23 @@ run()
 
 #### Identity.getOne
 
+#### 查询发送请求
 
+获取身份标识发出的所有待处理授权请求 getSent()
+
+```js
+import { Polymesh } from '@polymeshassociation/polymesh-sdk';
+import { LocalSigningManager } from '@polymeshassociation/local-signing-manager';
+// ......
+async function run(){
+  const signingManagerAlice = await LocalSigningManager.create({...});
+  const apiAlice = await Polymesh.connect({...});
+  const Signing =  await apiAlice.accountManagement.getSigningAccount()
+  const identity = await Signing.getIdentity()
+  const sent = await identity.authorizations.getSent()
+}
+run()
+```
 
 #### 获取投资组合
 
@@ -1044,7 +1154,7 @@ async function run(){
   const signingManagerAlice = await LocalSigningManager.create({...});
   const apiAlice = await Polymesh.connect({...});
   const venue = await this.apiAlice.settlements.getVenue({...});
-  // 投资组合
+  const identity = await Signing.getIdentity()
   const portfolio = await identity.portfolios.getPortfolio()
   const details = await venue.addDirective({
     legs:[{
