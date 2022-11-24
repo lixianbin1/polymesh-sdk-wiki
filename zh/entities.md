@@ -292,9 +292,13 @@
     - generateUuid
     - unserialize
 
-## Account
+## 相关功能
 
-### 查询单个授权
+  - [权限相关](./permissions.md)
+
+### Account
+
+#### 查询单个授权
 
 通过授权ID查询单个授权请求 getOne()
 
@@ -314,7 +318,7 @@ async function run(){
 run()
 ```
 
-### 查询所有授权
+#### 查询所有授权
 
 查询所有授权请求,可通过参数进行筛选 getReceived()
 
@@ -350,7 +354,7 @@ async function run(){
 run()
 ```
 
-### 检查权限
+#### 检查权限
 
 检查此帐户是否具有代表其相应身份行事的某些权限 checkPermissions()
 
@@ -493,7 +497,7 @@ async function run(){
 run()
 ```
 
-### 获取交易历史记录
+#### 获取交易历史记录
 
 查看交易的历史记录，需要`中间件` getTransactionHistory()
 
