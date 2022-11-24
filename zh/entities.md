@@ -21,7 +21,7 @@
     - [查看补贴](#查看补贴) getSubsidy()
     - [获取交易历史记录](#获取交易历史记录) getTransactionHistory()
     - 获取交易历史记录v2 getTransactionHistoryV2()
-    - [拥有权限](#拥有权限) hasPermissions()
+    - [是否拥有权限](#是否拥有权限) hasPermissions()
     - [是否相同](#Account.isEqual) isEqual()
     - [是否冻结](#Account.isFrozen) isFrozen()
     - [人类可读](#Account.toHuman) toHuman()
@@ -62,11 +62,14 @@
         - 设置标识 set
     - 公司行为 corporateActions
       - 分配 distributions
-      - 获取代理 getAgents
-      - 获取默认配置 getDefaultConfig
-      - 删除公司行为 remove
-      - 删除代理 removeAgent
-      - 设置代理 setAgent
+        - [配置股息分配](#配置股息分配) configureDividendDistribution()
+        - [查询所有股息](#查询所有股息) get()
+        - [查询单独股息](#查询单独股息) getOne()
+      - 获取代理 getAgents() **已弃用** 推荐[查询代理权限](#查询代理权限)
+      - [获取默认配置](#获取默认配置) getDefaultConfig()
+      - [删除公司行为](#删除公司行为) remove()
+      - 删除代理 removeAgent() **已弃用** 推荐[删除代理](#删除代理)
+      - 设置代理 setAgent() **已弃用** 推荐[邀请代理](#邀请代理)
       - 设置默认配置 setDefaultConfig
     - 标识 did :资产的标识 ID（用于声明）
     - 文件 documents
@@ -80,11 +83,11 @@
       - 启动产品 launch()
     - 权限 permissions
       - 创建权限组 createGroup
-      - 查询代理权限组 getAgents
+      - [查询代理权限](#查询代理权限) getAgents
       - 查询单个权限组 getGroup
       - [查询所有权限组](#查询所有权限组) getGroups()
       - [邀请代理](#邀请代理) inviteAgent()
-      - 删除代理 removeAgent
+      - [删除代理](#删除代理) removeAgent()
     - 结算 settlements
       - [是否可转让代币](#是否可转让代币) canSettle()
       - [是否可转让资产](#是否可转让资产) canTransfer()
@@ -175,7 +178,7 @@
     - 生成Uuid generateUuid()
     - 解析Uuid unserialize()
 
-  - 默认端口页 DefaultPortfolio
+  - 默认投资组合 DefaultPortfolio
     - 投资组合所有者身份 owner
     - 标识 uuid :由标识转为的`uuid`,继承于实体Entity
     - 是否存在 exists()
@@ -197,6 +200,16 @@
 
   - 身份 Identity
     - 资产权限 assetPermissions
+      - checkPermissions
+      - enabledAt
+      - enabledAtV2
+      - get
+      - getGroup
+      - getOperationHistory
+      - getOperationHistoryV2
+      - hasPermissions
+      - setGroup
+      - waive
     - 身份授权 authorizations
       - [查询单个授权](#Identity.getOne) getOne
       - getReceived
@@ -215,7 +228,7 @@
     - 查看资产列表 getHeldAssets()
     - 查看资产列表V2 getHeldAssetsV2()
     - [获取所有指令](获取所有指令) getInstructions()
-    - 查看未支付的股息分配 getPendingDistributions()
+    - [查看未支付的股息分配](#查看未支付的股息分配) getPendingDistributions()
     - 查看待处理的指令 getPendingInstructions()
     - [查看主账户](#查看主账户) getPrimaryAccount()
     - 获取关联ID getScopeId()
@@ -254,6 +267,15 @@
     - 解析Uuid unserialize()
 
   - 已知权限组 KnownPermissionGroup
+    - 资产 asset :相关的资产实例
+    - 类型 type :[权限组类型](#权限组类型)
+    - 标识 uuid :由标识转为的`uuid`,继承于实体Entity
+    - [是否存在](#KnownPermissionGroup.exists) exists()
+    - [权限详情](#权限详情) getPermissions()
+    - [是否相等](#是否相等) isEqual()
+    - toHuman
+    - generateUuid
+    - unserialize
 
   - 场地 Venue
     - 场地ID id :场地标识符编号 
@@ -495,7 +517,7 @@ async function run(){
 run()
 ```
 
-#### 拥有权限
+#### 是否拥有权限
 
 查询该账户是否拥有此权限 hasPermissions()
 
@@ -851,6 +873,140 @@ async function run(){
 run()
 ```
 
+#### 配置股息分配
+
+通过公司行为创建股息分配，在执行人付款后，股息直接到帐，在执行人未付款的时候，需要接受人去认领
+
+```js
+import { Polymesh } from '@polymeshassociation/polymesh-sdk';
+import { LocalSigningManager } from '@polymeshassociation/local-signing-manager';
+// ......
+async function run(){
+  const signingManagerAlice = await LocalSigningManager.create({...});
+  const apiAlice = await Polymesh.connect({...});
+  const assets = await apiAlice.assets.getAsset({ticker:'LXB'});
+  const checkpoint = await assets.checkpoints.getOne({...})
+  // 在给相应的接受人创建股息的时候，需要选择有该接受人的检查点
+  const createQ = await asset.corporateActions.distributions.configureDividendDistribution({
+    checkpoint, //检查点
+    originPortfolio, // 默认为 默认投资组合
+    currency: 'USD', // 支付的代币
+    perShare: new BigNumber(10), //每股的股息
+    maxAmount: new BigNumber(500), //最大可分配的金额
+    paymentDate: new Date(...), //支付的时间
+    expiryDate: new Date(...), //过期时间，需要比支付时间后
+    declarationDate: new Date(...), //声明日期，需要在检查点日期前
+    description: 'Gonna throw some money around', //备注
+    targets: { //目标 持股接收人
+      identities: [
+        '0x0100000000000000000000000000000000000000000000000000000000000000',
+        '0x0200000000000000000000000000000000000000000000000000000000000000',
+      ],
+      treatment: 'Include', //类型 包含或是排除
+    }, // optional
+    defaultTaxWithholding: new BigNumber(10), //默认预扣税
+    taxWithholdings: [ //配置各人的扣税
+      {
+        identity: '0x0100000000000000000000000000000000000000000000000000000000000000',
+        percentage: new BigNumber(15),
+      },
+    ],
+  });
+  const distribution = await createQ.run();
+}
+run()
+```
+
+#### 查询所有股息
+
+查询和选择资产有关的所有股息
+
+```js
+import { Polymesh } from '@polymeshassociation/polymesh-sdk';
+import { LocalSigningManager } from '@polymeshassociation/local-signing-manager';
+// ......
+async function run(){
+  const signingManagerAlice = await LocalSigningManager.create({...});
+  const apiAlice = await Polymesh.connect({...});
+  const assets = await apiAlice.assets.getAsset({ticker:'LXB'});
+  const checkpoint = await assets.checkpoints.get()
+}
+run()
+```
+
+#### 查询单独股息
+
+查询和选择资产有关的单独的指定股息
+
+```js
+import { Polymesh } from '@polymeshassociation/polymesh-sdk';
+import { LocalSigningManager } from '@polymeshassociation/local-signing-manager';
+// ......
+async function run(){
+  const signingManagerAlice = await LocalSigningManager.create({...});
+  const apiAlice = await Polymesh.connect({...});
+  const assets = await apiAlice.assets.getAsset({ticker:'LXB'});
+  const checkpoint = await assets.checkpoints.getOne({
+    id:new BigNumber(1) //股息的ID
+  })
+}
+run()
+```
+
+#### 获取代理
+
+获取资产的公司行为代理人列表
+
+```js
+import { Polymesh } from '@polymeshassociation/polymesh-sdk';
+import { LocalSigningManager } from '@polymeshassociation/local-signing-manager';
+// ......
+async function run(){
+  const signingManagerAlice = await LocalSigningManager.create({...});
+  const apiAlice = await Polymesh.connect({...});
+  const assets = await apiAlice.assets.getAsset({ticker:'LXB'});
+  const agents = await assets.corporateActions.getAgents()
+}
+run()
+```
+
+#### 获取默认配置
+
+检索由目标、全局预扣税百分比和每个身份的预扣税百分比组成的默认配置
+
+```js
+import { Polymesh } from '@polymeshassociation/polymesh-sdk';
+import { LocalSigningManager } from '@polymeshassociation/local-signing-manager';
+// ......
+async function run(){
+  const signingManagerAlice = await LocalSigningManager.create({...});
+  const apiAlice = await Polymesh.connect({...});
+  const assets = await apiAlice.assets.getAsset({ticker:'LXB'});
+  const default = await assets.corporateActions.getDefaultConfig()
+}
+run()
+```
+
+#### 删除公司行为
+
+删除公司行为,已激活分发的公司行为不能删除
+
+```js
+import { Polymesh } from '@polymeshassociation/polymesh-sdk';
+import { LocalSigningManager } from '@polymeshassociation/local-signing-manager';
+// ......
+async function run(){
+  const signingManagerAlice = await LocalSigningManager.create({...});
+  const apiAlice = await Polymesh.connect({...});
+  const assets = await apiAlice.assets.getAsset({ticker:'LXB'});
+  const remove = await assets.corporateActions.remove({
+    corporateAction:new BigNumber(1) //公司行为ID
+  })
+  remove.run()
+}
+run()
+```
+
 #### 发行铸币
 
 给指定的资产发行代币
@@ -867,6 +1023,21 @@ async function run(){
     // amount:需要发行的代币数量
     amount:new BigNumber(100)
   })
+}
+run()
+```
+
+#### 查询代理权限
+
+```js
+import { Polymesh } from '@polymeshassociation/polymesh-sdk';
+import { LocalSigningManager } from '@polymeshassociation/local-signing-manager';
+// ......
+async function run(){
+  const signingManagerAlice = await LocalSigningManager.create({...});
+  const apiAlice = await Polymesh.connect({...});
+  const assets = await apiAlice.assets.getAsset({ticker:'LXB'});
+  const agents = await assets.permissions.getAgents()
 }
 run()
 ```
@@ -903,6 +1074,31 @@ async function run(){
   const assets = await apiAlice.assets.getAsset({ticker:'LXB'});
   const groups = await assets.permissions.getGroups()
   const invite = await assets.permissions.inviteAgent({
+    // 可选:过期时间，不设置则永不过期 
+    // expiry:null,
+    // 必选:权限组
+    permissions:groups.known[0],
+    target:'0xa75673cc417b0d958155fde4d39309c64c2f438cec9919bda1a9242f9dda4736',
+  })
+  await invite.run()
+}
+run()
+```
+
+#### 删除代理
+
+删除此资产具有权限的代理 removeAgent()
+
+```js
+import { Polymesh } from '@polymeshassociation/polymesh-sdk';
+import { LocalSigningManager } from '@polymeshassociation/local-signing-manager';
+// ......
+async function run(){
+  const signingManagerAlice = await LocalSigningManager.create({...});
+  const apiAlice = await Polymesh.connect({...});
+  const assets = await apiAlice.assets.getAsset({ticker:'LXB'});
+  const groups = await assets.permissions.getGroups()
+  const invite = await assets.permissions.removeAgent({
     // 可选:过期时间，不设置则永不过期 
     // expiry:null,
     // 必选:权限组
@@ -1142,6 +1338,46 @@ async function run(){
 run()
 ```
 
+#### KnownPermissionGroup.exists
+
+检查已知权限组是否在区块链上 exists()
+
+```js
+import { Polymesh } from '@polymeshassociation/polymesh-sdk';
+import { LocalSigningManager } from '@polymeshassociation/local-signing-manager';
+// ......
+async function run(){
+  const signingManagerAlice = await LocalSigningManager.create({...});
+  const apiAlice = await Polymesh.connect({...});
+  const assets = await apiAlice.assets.getAsset({ticker:'LXB'});
+  const groups = await assets.permissions.getGroups()
+  const exists = await groups[0].exists()
+}
+run()
+```
+
+#### 权限详情
+
+获取已知权限组的详细权限 getPermissions()
+
+```js
+import { Polymesh } from '@polymeshassociation/polymesh-sdk';
+import { LocalSigningManager } from '@polymeshassociation/local-signing-manager';
+// ......
+async function run(){
+  const signingManagerAlice = await LocalSigningManager.create({...});
+  const apiAlice = await Polymesh.connect({...});
+  const assets = await apiAlice.assets.getAsset({ticker:'LXB'});
+  const groups = await assets.permissions.getGroups()
+  const permiss = await groups.known[0].getPermissions()
+}
+run()
+```
+
+#### 是否相等
+
+
+
 #### 添加结算指令
 
 添加结算指令 addDirective()
@@ -1221,5 +1457,14 @@ async function run(){
 }
 run()
 ```
+
+### 权限组类型
+
+ - Full :所有交易授权
+ - ExceptMeta :除Meta外
+ - PolymeshV1Caa :企业行动 公司选票 资本分布
+ - PolymeshV1Pia :资产问题 资产赎回 资产.控制者转移 STO（sto.invest除外）
+
+
 
 [下一个 Polkadot](../polkadot/README.md)

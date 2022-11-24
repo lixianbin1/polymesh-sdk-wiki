@@ -70,7 +70,7 @@ Polymesh是一种使您能够在区块链上创建、发行和管理数字证券
     - [获取指令](#获取指令) getInstruction
     - [授权指令](#授权指令) affirmInstruction
     - [创建场地](#创建场地) createVenue
-    - [获取场地实例](#获取场地实例) getVenue 
+    - [获取场地实例](#获取场地实例) getVenue
 
   - [Polymesh](#Polymesh)
     - 账户管理 accountManagement
