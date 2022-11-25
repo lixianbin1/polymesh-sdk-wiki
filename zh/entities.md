@@ -82,9 +82,9 @@
       - 查询单个产品 getOne()
       - 启动产品 launch()
     - 权限 permissions
-      - 创建权限组 createGroup
+      - [创建权限组](#创建权限组) createGroup
       - [查询代理权限](#查询代理权限) getAgents
-      - 查询单个权限组 getGroup
+      - [查询单个权限组](#查询单个权限组) getGroup
       - [查询所有权限组](#查询所有权限组) getGroups()
       - [邀请代理](#邀请代理) inviteAgent()
       - [删除代理](#删除代理) removeAgent()
@@ -200,19 +200,19 @@
 
   - 身份 Identity
     - 资产权限 assetPermissions
-      - checkPermissions
-      - enabledAt
-      - enabledAtV2
-      - get
-      - getGroup
+      - [检查权限](#Identity.检查权限) checkPermissions()
+      - [查看添加权限块](#查看添加权限块) enabledAt()
+      - [查看添加权限块V2](查看添加权限块V2) enabledAtV2()
+      - [获取所有](#获取所有) get()
+      - [获取权限组](#获取权限组) getGroup()
       - getOperationHistory
       - getOperationHistoryV2
-      - hasPermissions
-      - setGroup
-      - waive
+      - [是否有权限](#是否有权限) hasPermissions()
+      - [设置权限组](#设置权限组) setGroup()
+      - [退出权限组](#退出权限组) waive()
     - 身份授权 authorizations
-      - [查询单个授权](#Identity.getOne) getOne
-      - getReceived
+      - [查询单个授权](#Identity.authorizations.getOne) getOne
+      - [查询所有授权](#Identity.authorizations.getReceived) getReceived
       - [查询发送请求](#查询发送请求) getSent
     - 身份ID did
     - 投资组合 portfolios
@@ -1031,6 +1031,41 @@ async function run(){
 run()
 ```
 
+#### 创建权限组
+
+给指定资产创建自定义权限组或者权限 **注意：不能再同一个资产创建具有相同权限的自定义权限**
+
+```js
+import { Polymesh } from '@polymeshassociation/polymesh-sdk';
+import { LocalSigningManager } from '@polymeshassociation/local-signing-manager';
+// ......
+async function run(){
+  const signingManagerAlice = await LocalSigningManager.create({...});
+  const apiAlice = await Polymesh.connect({...});
+  const assets = await apiAlice.assets.getAsset({ticker:'LXB'});
+  const creat = await assets.permissions.createGroup({
+    permissions:{
+      transactions:{ //权限
+        type:"Include", //权限类型:包含Include 或是排除Exclude
+        exceptions:[ //例外:比如包含A模块，但是A模块里的B权限不要。或者排除A模块，但是A模块的B权限我要
+          "asset.createAsset"
+        ], 
+        values:[ //值:包含或是排除的值
+          "asset", //模块名称
+          "corporateAction.changeRecordDate", //精细权限
+        ]
+      },
+      //设置了权限组，权限就不需要设置，设置权限，权限组就不要, 他们会互相自动生成
+      // transactionGroups:[ //权限组
+
+    // ],
+    }
+  })
+  await creat.run()
+}
+run()
+```
+
 #### 查询代理权限
 
 ```js
@@ -1042,6 +1077,27 @@ async function run(){
   const apiAlice = await Polymesh.connect({...});
   const assets = await apiAlice.assets.getAsset({ticker:'LXB'});
   const agents = await assets.permissions.getAgents()
+}
+run()
+```
+
+### 查询单个权限组
+
+查询此资产中单个特定的权限 传递ID 将获取自定义权限组，而传递类型将获取已知权限组
+
+```js
+import { Polymesh } from '@polymeshassociation/polymesh-sdk';
+import { LocalSigningManager } from '@polymeshassociation/local-signing-manager';
+// ......
+async function run(){
+  const signingManagerAlice = await LocalSigningManager.create({...});
+  const apiAlice = await Polymesh.connect({...});
+  const assets = await apiAlice.assets.getAsset({ticker:'LXB'});
+  const groups = await assets.permissions.getGroup({
+    type:"Full", //已知权限组的类型
+    // 传递type 就不传ID，传ID就不传type 二选一
+    // id:new BigNumber(1), //ID:自定义权限组的ID
+  })
 }
 run()
 ```
@@ -1229,7 +1285,164 @@ run()
 检索创建令牌时发出的事件的标识符数据（块号、日期和事件索引） createdAt()
 
 
-#### Identity.getOne
+### Identity
+
+#### Identity.检查权限
+
+检查此身份是否对资产具有特定的事务权限 checkPermissions()
+
+```js
+import { Polymesh } from '@polymeshassociation/polymesh-sdk';
+import { LocalSigningManager } from '@polymeshassociation/local-signing-manager';
+// ......
+async function run(){
+  const signingManagerAlice = await LocalSigningManager.create({...});
+  const apiAlice = await Polymesh.connect({...});
+  const account = await apiAlice.accountManagement.getSigningAccount()
+  const identity = await account.getIdentity()
+  const received = await identity.assetPermissions.checkPermissions({
+    // 必选参数:资产,null代表所有资产
+    assets:['LXB'], //资产名称，或资产实体
+    // 必选参数:事务,null代表查询是否拥有所有权限
+    transactions:null,
+  })
+}
+run()
+```
+
+#### 查看添加权限块
+
+查看添加此身份到指定资产的权限的区块 enabledAt()
+
+```js
+import { Polymesh } from '@polymeshassociation/polymesh-sdk';
+import { LocalSigningManager } from '@polymeshassociation/local-signing-manager';
+// ......
+async function run(){
+  const signingManagerAlice = await LocalSigningManager.create({...});
+  const apiAlice = await Polymesh.connect({...});
+  const account = await apiAlice.accountManagement.getSigningAccount()
+  const identity = await account.getIdentity()
+  const received = await identity.assetPermissions.enabledAt({
+    assets:'LXB', //资产名称，或资产实体
+  })
+}
+run()
+```
+
+#### 查看添加权限块V2
+
+使用中间件V2查看添加此身份到指定资产的权限的区块 enabledAtV2()
+
+```js
+import { Polymesh } from '@polymeshassociation/polymesh-sdk';
+import { LocalSigningManager } from '@polymeshassociation/local-signing-manager';
+// ......
+async function run(){
+  const signingManagerAlice = await LocalSigningManager.create({...});
+  const apiAlice = await Polymesh.connect({...});
+  const account = await apiAlice.accountManagement.getSigningAccount()
+  const identity = await account.getIdentity()
+  const received = await identity.assetPermissions.enabledAtV2({
+    assets:'LXB', //资产名称，或资产实体
+  })
+}
+run()
+```
+
+#### 获取所有
+
+获取该身份所有资产的权限组 get()
+
+```js
+import { Polymesh } from '@polymeshassociation/polymesh-sdk';
+import { LocalSigningManager } from '@polymeshassociation/local-signing-manager';
+// ......
+async function run(){
+  const signingManagerAlice = await LocalSigningManager.create({...});
+  const apiAlice = await Polymesh.connect({...});
+  const account = await apiAlice.accountManagement.getSigningAccount()
+  const identity = await account.getIdentity()
+  const received = await identity.assetPermissions.get()
+}
+run()
+```
+
+#### 获取权限组
+
+获取该身份所有资产的权限组 getGroup()
+
+```js
+import { Polymesh } from '@polymeshassociation/polymesh-sdk';
+import { LocalSigningManager } from '@polymeshassociation/local-signing-manager';
+// ......
+async function run(){
+  const signingManagerAlice = await LocalSigningManager.create({...});
+  const apiAlice = await Polymesh.connect({...});
+  const account = await apiAlice.accountManagement.getSigningAccount()
+  const identity = await account.getIdentity()
+  const received = await identity.assetPermissions.getGroup({
+    asset:"LXB" //资产名称或者资产实体
+  })
+}
+run()
+```
+
+#### Identity.authorizations.getOne
+
+```js
+import { Polymesh } from '@polymeshassociation/polymesh-sdk';
+import { LocalSigningManager } from '@polymeshassociation/local-signing-manager';
+// ......
+async function run(){
+  const signingManagerAlice = await LocalSigningManager.create({...});
+  const apiAlice = await Polymesh.connect({...});
+  const account = await apiAlice.accountManagement.getSigningAccount()
+  const identity = await account.getIdentity()
+  const received = await  identity.authorizations.getOne({
+    /*必填参数:授权的标识ID*/
+    id:new BigNumber(15438)
+  })
+}
+run()
+```
+
+#### Identity.authorizations.getReceived
+
+查询关于身份的所有授权,可通过参数进行筛选 getReceived()
+
+```js
+import { Polymesh } from '@polymeshassociation/polymesh-sdk';
+import { LocalSigningManager } from '@polymeshassociation/local-signing-manager';
+// ......
+async function run(){
+  const signingManagerAlice = await LocalSigningManager.create({...});
+  const apiAlice = await Polymesh.connect({...});
+  const account = await apiAlice.accountManagement.getSigningAccount();
+  const identity = await account.getIdentity()
+  const received = await identity.authorizations.getReceived({
+    /* 可选参数:筛选类型，默认为所有
+     'AddMultiSigSigner',
+     'AddRelayerPayingKey',
+     'AttestPrimaryKeyRotation',
+     'BecomeAgent',
+     'JoinIdentity',
+     'PortfolioCustody',
+     'RotatePrimaryKey',
+     'RotatePrimaryKeyToSecondary',
+     'TransferAssetOwnership',
+     'TransferTicker'
+    */
+    type:'AddMultiSigSigner',
+    /* 可选参数：是否包括过期的授权
+      true,
+      false
+    */
+    includeExpired:true,
+  })
+}
+run()
+```
 
 #### 查询发送请求
 
