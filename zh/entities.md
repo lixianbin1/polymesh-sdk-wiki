@@ -203,7 +203,7 @@
       - [检查权限](#Identity.检查权限) checkPermissions()
       - [查看添加权限块](#查看添加权限块) enabledAt()
       - [查看添加权限块V2](查看添加权限块V2) enabledAtV2()
-      - [获取所有](#获取所有) get()
+      - [获取所有权限组](#获取所有权限组) get()
       - [获取权限组](#获取权限组) getGroup()
       - getOperationHistory
       - getOperationHistoryV2
@@ -425,6 +425,9 @@ async function run(){
   const apiAlice = await Polymesh.connect({...});
   const account = await apiAlice.accountManagement.getSigningAccount();
   const nonce = await account.getCurrentNonce()
+
+  // 返回参数 
+  // BigNumber{s: 1, e: 0, c: Array(1)}
 }
 run()
 ```
@@ -1350,7 +1353,7 @@ async function run(){
 run()
 ```
 
-#### 获取所有
+#### 获取所有权限组
 
 获取该身份所有资产的权限组 get()
 

@@ -35,7 +35,7 @@ Polymesh是一种使您能够在区块链上创建、发行和管理数字证券
     - [添加唯一性投资者声明](#添加唯一性投资者声明) addInvestorUniquenessClaim
     - [编辑声明](#编辑声明) editClaims
     - [获取CDD列表](#获取CDD列表) getCddClaims
-    - [获取声明范围](#获取声明范围)getClaimScopes
+    - [获取被证明的列表](#获取被证明的列表)getClaimScopes
     - 通过声明获得身份 getIdentitiesWithClaims
     - 使用声明V2获取身份 getIdentitiesWithClaimsV2
     - [唯一投资者声明列表](#唯一投资者声明列表) getInvestorUniquenessClaims
@@ -115,6 +115,16 @@ async function run(){
     // 地址为必选参数
     address:'5CK7bPZJrCXAVTs1RznLee5ZcecQTbKopS92yzPF8SS2r7mH'
   });
+
+//  出参：账户实体
+//  {
+//    address: "5FWBFmHM2KraTMN8xqCccTeJoJz4STynAWUawyKYjKQUdY5g",
+//    authorizations: Authorizations,
+//    context: Proxy,
+//    key: "0x982210e72d5131d5edca5e68e4cbf30d9b863b730940c226a206a9da4516a935",
+//    uuid: "QWNjb3VudDp7ImFkZHJlc3MiOiI1RldCRm1ITTJLcmFUTU44eHFDY2NUZUpvSno0U1R5bkFXVWF3eUtZaktRVWRZNWcifQ==",
+//    ...
+//  }
 }
 run()
 ```
@@ -132,9 +142,16 @@ async function run(){
   const apiAlice = await Polymesh.connect({...});
   const account = await apiAlice.accountManagement.getAccount({...});
   const accountBalance = await apiAlice.accountManagement.getAccountBalance({
-    // 参数为可选参数
+    // 可选：账户，默认为当前账户
     account,
   });
+
+// 出参：账户金额
+// {
+//     "free": BigNumber {s: 1, e: 4, c: Array(2)}
+//     "locked": BigNumber {s: 1, e: 0, c: Array(1)},
+//     "total": BigNumber {s: 1, e: 4, c: Array(2)},       
+// }
 }
 run()
 ```
@@ -152,6 +169,16 @@ async function run(){
   const apiAlice = await Polymesh.connect({...});
   const account = await apiAlice.accountManagement.getAccount({...});
   const accountBalance = await apiAlice.accountManagement.getSigningAccount();
+
+//  出参：账户实体
+//  {
+//    address: "5FWBFmHM2KraTMN8xqCccTeJoJz4STynAWUawyKYjKQUdY5g",
+//    authorizations: Authorizations,
+//    context: Proxy,
+//    key: "0x982210e72d5131d5edca5e68e4cbf30d9b863b730940c226a206a9da4516a935",
+//    uuid: "QWNjb3VudDp7ImFkZHJlc3MiOiI1RldCRm1ITTJLcmFUTU44eHFDY2NUZUpvSno0U1R5bkFXVWF3eUtZaktRVWRZNWcifQ==",
+//    ...
+//  }
 }
 run()
 ```
@@ -169,13 +196,24 @@ async function run(){
   const apiAlice = await Polymesh.connect({...});
   const account = await apiAlice.accountManagement.getAccount({...});
   const accountBalance = await apiAlice.accountManagement.getSigningAccounts();
+
+//  出参：账户实体
+//  [{
+//    address: "5FWBFmHM2KraTMN8xqCccTeJoJz4STynAWUawyKYjKQUdY5g",
+//    authorizations: Authorizations,
+//    context: Proxy,
+//    key: "0x982210e72d5131d5edca5e68e4cbf30d9b863b730940c226a206a9da4516a935",
+//    uuid: "QWNjb3VudDp7ImFkZHJlc3MiOiI1RldCRm1ITTJLcmFUTU44eHFDY2NUZUpvSno0U1R5bkFXVWF3eUtZaktRVWRZNWcifQ==",
+//    ...
+//  }...]
 }
 run()
 ```
 
 #### 创建多重签名账户
 
-需要使用一个拥有身份标识的账户替一个没有身份标识的账户进行创建。 createMultiSigAccount()
+需要使用一个拥有身份标识的账户替多个没身份标识的账户进行创建， createMultiSigAccount()
+为了安全考虑，当多重签名账户发出交易的时候，需要多个人进行签名。 n/m 比如有m个人，当一笔交易发出后，需要n个人进行签名，才能成功
 
 ```js
 import { Polymesh } from '@polymeshassociation/polymesh-sdk';
@@ -431,7 +469,7 @@ async function run(){
   const assets = await apiAlice.assets.getAsset({
     // 必填参数：资产名称
     ticker:"QK"
-  });
+  });  
 }
 run()
 ```
@@ -699,9 +737,9 @@ async function run(){
 run()
 ```
 
-#### 获取声明范围
+#### 获取被证明的列表
 
-根据身份标识获取声明范围,根据标识返回对应的作用范围，如身份标识可返回托管的资产 getClaimScopes
+根据身份标识获取被添加声明范围的资产列表,根据标识返回对应的作用范围，如身份标识可返回托管的资产 getClaimScopes
 
 ```js
 import { Polymesh } from '@polymeshassociation/polymesh-sdk';
@@ -714,6 +752,18 @@ async function run(){
     // 可选参数，默认为当前账号 target
     target: '0xa39bd22fd2f078fd1c300614f564dda94a90ad3884601677fb3042b591dbede2',
   });
+
+// 返回:被添加证明的资产列表
+// [
+//     {
+//         "scope": {
+//             "type": "Ticker",
+//             "value": "LLL"
+//         },
+//         "ticker": "LLL"
+//     },
+//     ...
+// ]
 }
 run()
 ```
@@ -738,7 +788,7 @@ run()
 
 #### 查询所有声明
 
-查询账户标识的所有声明，需要中间件 getIssuedClaims()
+查询账户标识的做为信任证明商发出的所有声明，需要中间件 getIssuedClaims()
 
 ```js
 import { Polymesh } from '@polymeshassociation/polymesh-sdk';
@@ -1227,7 +1277,7 @@ import { LocalSigningManager } from '@polymeshassociation/local-signing-manager'
 async function run(){
   const signingManagerAlice = await LocalSigningManager.create({...});
   const apiAlice = await Polymesh.connect({...});
-  const account = await apiAlice.getAccount({...})
+  const account = await apiAlice.accountManagement.getAccount({...})
   await apiAlice.setSigningAccount(account);
 }
 run()

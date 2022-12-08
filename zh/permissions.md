@@ -48,7 +48,7 @@
 
 ### 修改辅助账户权限
 
-修改辅助账户权限 modifyPermissions()
+修改辅助账户的对资产的权限，需要主账户拥有资产权限 modifyPermissions()
 
 ```js
 import { Polymesh } from '@polymeshassociation/polymesh-sdk';

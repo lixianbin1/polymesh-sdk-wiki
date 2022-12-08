@@ -385,3 +385,7 @@ api.tx.balances.transfer('5CQLm1GWpnq9zbAnJqRnTupJvB4QVtx9K8aaBuPYea5KVCo4', 100
     console.log(':( transaction failed', error)
   })
 ```
+
+## 注意
+
+ - polkadot 和 polymesh 有所不同，polymesh有的方法是提供给 polkadot 使用的，并未申明在polymesh的wiki中。
