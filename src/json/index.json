@@ -66,6 +66,21 @@
           "type":"mandatory",
           "docs":"请输入资产名称"
         }]
+      },
+      {
+        "name":"get",
+        "type":"method",
+        "docs":"查询区块链上的所有资产",
+        "parameters":[{
+          "name":"size",
+          "datetype":"BigNumber",
+          "type":"mandatory",
+          "docs":"请输入分页大小"
+        },{
+          "name":"start",
+          "type":"optional",
+          "docs":"请输入起始页"
+        }]
       }
     ]
   },
@@ -86,6 +101,30 @@
           "name":"target",
           "type":"optional",
           "docs":"要为获取CDD声明的身份"
+        }]
+      },
+      {
+        "name":"getIssuedClaims",
+        "type":"method",
+        "docs":"查询账户标识的做为信任证明商发出的所有声明",
+        "parameters":[{
+          "name":"includeExpired",
+          "type":"optional",
+          "docs":"是否包括过期的声明"
+        },{
+          "name":"target",
+          "type":"optional",
+          "docs":"要为获取CDD声明的身份"
+        },{
+          "name":"size",
+          "type":"optional",
+          "datetype":"BigNumber",
+          "docs":"请输入分页大小"
+        },{
+          "name":"start",
+          "type":"optional",
+          "datetype":"BigNumber",
+          "docs":"请输入起始页"
         }]
       }
     ]

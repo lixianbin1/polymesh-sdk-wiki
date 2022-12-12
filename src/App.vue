@@ -74,7 +74,7 @@
       </el-form>  
 
       <div v-for="(item,i) in htmlString" :key="i" class="preBox">
-        <el-row v-show="item" :gutter="20">
+        <el-row v-show="item" :gutter="20" >
           <el-col :span="23">
             <pre>{{item}}</pre>
           </el-col>
@@ -132,7 +132,9 @@ export default {
         const OneName = OneObj.name
         const TwoObj=this.options[this.client].children[this.proapi]
         const TwoName = TwoObj.name
+        console.log(this.form)
         let objectJSON = await this.polymesh[OneName][TwoName](this.form)
+        console.log(objectJSON)
         if(objectJSON.hasRun===false){
           const runDate=await objectJSON.run()
           this.htmlString.unshift(this.setDate(runDate))
@@ -191,6 +193,11 @@ export default {
 </script>
 
 <style scoped>
+@keyframes myfirst
+{
+    from {background: #fdf1b9;}
+    to {background: #eee;}
+}
 #app{padding:15px}
 .title{margin-bottom:10px}
 .select,.picker{
@@ -206,6 +213,9 @@ export default {
 }
 .forBox,.preBox{
   margin-bottom: 20px;
+}
+.preBox >>> div{
+  animation: myfirst 5s;
 }
 .inputSize{
   height: 36px;
