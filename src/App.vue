@@ -1,80 +1,86 @@
 <template>
   <div id="app">
-    <h2 class="title">Polymesh 常规 API</h2>
-    <el-row :gutter="20">
-      <el-col :span="23">
-        <el-row :gutter="20">
-          <el-col :span="6">
-            <el-select v-model="client" size="mini" class="select" placeholder="请选择" @change="changeClient">
+    <el-skeleton v-if="loading" animated/>
+    <div v-else>
+      <h2 class="title">Polymesh 常规 API</h2>
+      <el-row :gutter="20">
+        <el-col :span="23">
+          <el-row :gutter="20">
+            <el-col :span="6">
+              <el-select v-model="client" size="mini" class="select" placeholder="请选择" @change="changeClient">
+                <el-option
+                  v-for="(item,i) in options"
+                  :key="item.name"
+                  :label="item.name"
+                  :value="i">
+                  <span style="float: left">{{ item.name }}</span>
+                  <span style="float: right; color: #8492a6; font-size: 13px">{{ item.docs }}</span>
+                </el-option>
+              </el-select>
+            </el-col>
+            <el-col :span="18">
+              <el-select v-model="proapi" size="mini" class="select" placeholder="请选择" @change="changeProapi">
+                <el-option
+                  v-for="(item,i) in options[client]?.children"
+                  :key="item.name"
+                  :label="item.name"
+                  :value="i">
+                  <span style="float: left">{{ item.name }}</span>
+                  <span style="float: right; color: #8492a6; font-size: 13px">{{ item.docs }}</span>
+                </el-option>
+              </el-select>
+            </el-col>
+          </el-row>
+        </el-col>
+        <el-col :span="1">
+          <el-button class="botton" type="primary" icon="el-icon-search" circle @click="search"></el-button>
+        </el-col>
+      </el-row>  
+
+      <el-form ref="form" :model="form" label-width="80px" class="forBox">
+        <el-row :gutter="20" v-for="(item,k) in options[client].children[proapi]?.parameters" :key="item.name">
+          <el-col :span="1"></el-col>
+          <el-col :span="22" v-if="item.name=='account'">
+            <el-select @change="changeAcc(item.name)" v-model="temporary"  size="mini" class="select" :placeholder="item.docs" :disabled="!switchAcc2[k] && item.type=='optional'" clearable>
               <el-option
-                v-for="(item,i) in options"
-                :key="item.name"
-                :label="item.name"
+                v-for="(item,i) in accounts"
+                :key="item.address"
+                :label="item.address"
                 :value="i">
               </el-option>
             </el-select>
           </el-col>
-          <el-col :span="18">
-            <el-select v-model="proapi" size="mini" class="select" placeholder="请选择" @change="changeProapi">
-              <el-option
-                v-for="(item,i) in options[client]?.children"
-                :key="item.name"
-                :label="item.name"
-                :value="i">
-                <span style="float: left">{{ item.name }}</span>
-                <span style="float: right; color: #8492a6; font-size: 13px">{{ item.docs }}</span>
-              </el-option>
-            </el-select>
+          <el-col :span="22" v-else-if="item.name=='expiry'">
+            <el-date-picker
+              :disabled="!switchAcc2[k] && item.type=='optional'"
+              class="picker"
+              @change="(val)=>changePic(val)"
+              v-model="switchAcc[k]"
+              type="datetime"
+              :placeholder="item.docs">
+            </el-date-picker>
+          </el-col>
+          <el-col :span="22" v-else>
+            <el-input @change="(val)=>changeAtt(val,item.name,item)" v-model="switchAcc[k]" :placeholder="item.docs" class="inputSize" :disabled="!switchAcc2[k] && item.type=='optional'" clearable></el-input>
+          </el-col>
+          <el-col :span="1" v-if="item.type=='optional'">
+            <el-switch
+              v-model="switchAcc2[k]"
+              @change="val=>changeSwi(val,item.name)"
+              active-color="#13ce66">
+            </el-switch>
           </el-col>
         </el-row>
-      </el-col>
-      <el-col :span="1">
-        <el-button class="botton" type="primary" icon="el-icon-search" circle @click="search"></el-button>
-      </el-col>
-    </el-row>
+      </el-form>  
 
-    <el-form ref="form" :model="form" label-width="80px" class="forBox">
-      <el-row :gutter="20" v-for="(item,k) in options[client].children[proapi]?.parameters" :key="item.name">
-        <el-col :span="1"></el-col>
-        <el-col :span="22" v-if="item.name=='account'">
-          <el-select @change="changeAcc(item.name)" v-model="temporary"  size="mini" class="select" :placeholder="item.docs" :disabled="!switchAcc2[k] && item.type=='optional'" clearable>
-            <el-option
-              v-for="(item,i) in accounts"
-              :key="item.address"
-              :label="item.address"
-              :value="i">
-            </el-option>
-          </el-select>
-        </el-col>
-        <el-col :span="22" v-else-if="item.name=='expiry'">
-          <el-date-picker
-            :disabled="!switchAcc2[k] && item.type=='optional'"
-            class="picker"
-            @change="(val)=>changePic(val)"
-            v-model="switchAcc[k]"
-            type="datetime"
-            :placeholder="item.docs">
-          </el-date-picker>
-        </el-col>
-        <el-col :span="22" v-else>
-          <el-input @change="(val)=>changeAtt(val,item.name,item)" v-model="switchAcc[k]" :placeholder="item.docs" class="inputSize" :disabled="!switchAcc2[k] && item.type=='optional'" clearable></el-input>
-        </el-col>
-        <el-col :span="1" v-if="item.type=='optional'">
-          <el-switch
-            v-model="switchAcc2[k]"
-            @change="val=>changeSwi(val,item.name)"
-            active-color="#13ce66">
-          </el-switch>
-        </el-col>
-      </el-row>
-    </el-form>
+      <div v-for="(item,i) in htmlString" :key="i" class="preBox">
+        <el-row v-show="item" :gutter="20">
+          <el-col :span="23">
+            <pre>{{item}}</pre>
+          </el-col>
+        </el-row>
+      </div>
 
-    <div v-for="(item,i) in htmlString" :key="i" class="preBox">
-      <el-row v-show="item" :gutter="20">
-        <el-col :span="23">
-          <pre>{{item}}</pre>
-        </el-col>
-      </el-row>
     </div>
   </div>
 </template>
@@ -89,6 +95,7 @@ export default {
   },
   data(){
     return{
+      loading:true,
       options:json, // json数据
       client:0,// 当前client数据
       proapi:0, //当前选择的方法
@@ -108,9 +115,15 @@ export default {
   methods:{
     // 查找所有账号
     async init(){
-      const accounts = await this.polymesh.accountManagement.getSigningAccounts()
-      this.accounts = accounts
-      console.log(accounts)
+      if(this.polymesh){
+        const accounts = await this.polymesh.accountManagement.getSigningAccounts()
+        this.accounts = accounts
+        this.loading = false
+      }else{
+        setTimeout(()=>{
+          this.init()
+        },100)
+      }
     },
     // 查询功能
     async search(){
@@ -178,7 +191,6 @@ export default {
 </script>
 
 <style scoped>
-*{margin:0;padding:0}
 #app{padding:15px}
 .title{margin-bottom:10px}
 .select,.picker{

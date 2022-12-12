@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@polymeshassociation/browser-extension-signing-manager": "^1.1.1",
+    "@polymeshassociation/local-signing-manager": "^1.2.1",
     "@polymeshassociation/polymesh-sdk": "^18.0.2",
     "core-js": "^3.8.3",
     "element-ui": "^2.15.12",
@@ -25,6 +26,10 @@
     "eslint-plugin-vue": "^8.0.3",
     "node-polyfill-webpack-plugin": "^2.0.1",
     "vue-template-compiler": "^2.6.14"
+  },
+  "overrides": {
+    "@polkadot/util": "9.7.2",
+    "@polkadot/util-crypto": "9.7.2"
   },
   "eslintConfig": {
     "root": true,
