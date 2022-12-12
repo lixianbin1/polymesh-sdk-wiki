@@ -478,8 +478,25 @@ async function run(){
   const apiAlice = await Polymesh.connect({...});
   const assets = await apiAlice.assets.getAsset({
     // 必填参数：资产名称
-    ticker:"QK"
-  });  
+    ticker:"LXB"
+  });
+
+//  返回 资产实例
+//  {
+//      "uuid": "QXNzZXQ6eyJ0aWNrZXIiOiJMWEIifQ==",
+//      "ticker": "LXB",
+//      "did": "0x9694f473c82dbbfb4148000a897e2d59498cae2851f046da820fb13266a4155a",
+//      "documents": {...},
+//      "settlements": {...},
+//      "assetHolders": {...},
+//      "issuance": {...},
+//      "compliance": {...},
+//      "transferRestrictions": {...},
+//      "offerings": {},
+//      "checkpoints": {...},
+//      "corporateActions": {...},
+//      "permissions": {}
+//  }
 }
 run()
 ```
@@ -495,9 +512,39 @@ import { LocalSigningManager } from '@polymeshassociation/local-signing-manager'
 async function run(){
   const signingManagerAlice = await LocalSigningManager.create({...});
   const apiAlice = await Polymesh.connect({...});
-  const assetsList = await apiAlice.assets.get();
+  const assetsList = await apiAlice.assets.get({
+    // 必选参数：页数大小
+    size:new BigNumber(10),
+    // 可选参数：当前开始页数 ，参数好像有问题
+    // start:1
+  });
+
+//  返回资产list数据
+//  {
+//      "data": [
+//          {
+//              "uuid": "QXNzZXQ6eyJ0aWNrZXIiOiJNQkFUIn0=",
+//              "ticker": "MBAT",
+//              "did": "0xf77c804c654441fd37d3987b064ce17bc036d1a10d56f1a2bfd6f525d59a1085",
+//              "documents": {...},
+//              "settlements": {...},
+//              "assetHolders": {...},
+//              "issuance": {...},
+//              "compliance": {...},
+//              "transferRestrictions": {...},
+//              "offerings": {},
+//              "checkpoints": {...},
+//              "corporateActions": {...},
+//              "permissions": {}
+//          },
+//      ],
+//      next: "0xd34371a193a751eea5883e9553457b2e7bc3facbeb855a178f0a0835606d05ce0059afd2407cab5832b82ec834dbc295454c53452d504f4c59583200"
+//  }
 }
 run()
+
+
+
 ```
 
 #### 申领以太坊股票代码
@@ -846,6 +893,28 @@ async function run(){
   const signingManagerAlice = await LocalSigningManager.create({...});
   const apiAlice = await Polymesh.connect({...});
   const scopes = await apiAlice.claims.getIssuedClaims({
+    // 可选参数
+    includeExpired:true, //是否包含过期声明
+    size:new BigNumber(10), //分页数
+    start:1, //当前页数
+    target:'0xa39bd22fd2f078fd1c300614f564dda94a90ad3884601677fb3042b591dbede2' //身份标识
+  });
+}
+run()
+```
+
+#### 查询所有声明v2
+
+查询账户标识的做为信任证明商发出的所有声明，需要中间件v2 getIssuedClaimsV2
+
+```js
+import { Polymesh } from '@polymeshassociation/polymesh-sdk';
+import { LocalSigningManager } from '@polymeshassociation/local-signing-manager';
+// ......
+async function run(){
+  const signingManagerAlice = await LocalSigningManager.create({...});
+  const apiAlice = await Polymesh.connect({...});
+  const scopes = await apiAlice.claims.getIssuedClaimsV2({
     // 可选参数
     includeExpired:true, //是否包含过期声明
     size:10, //分页数
