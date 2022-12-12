@@ -6,7 +6,7 @@ Polymesh是一种使您能够在区块链上创建、发行和管理数字证券
 
 ## API目录
 
-  - [账户管理](#账户管理)
+  - [账户管理](#账户管理) accountManagement
     - [获取账户实例](#获取账户实例) getAccount
     - [查询账户余额](#查询账户余额) getAccountBalance
     - [查询默认签名账户](#查询默认签名账户) getSigningAccount
@@ -20,7 +20,7 @@ Polymesh是一种使您能够在区块链上创建、发行和管理数字证券
     - [解冻辅助账户](解冻辅助账户) unfreezeSecondaryAccounts
     - [删除辅助账户](#删除辅助账户)removeSecondaryAccounts
     - [离开辅助账户的身份](#离开辅助账户的身份) leaveIdentity
-  - [资产](#资产)
+  - [资产](#资产) assets
     - [获取资产实例](#获取资产实例) getAsset
     - [查询区块链资产](#查询区块链资产) get
     - 申领以太坊股票代码 claimClassicTicker
@@ -30,27 +30,27 @@ Polymesh是一种使您能够在区块链上创建、发行和管理数字证券
     - [查询名称是否可用](#查询名称是否可用) isTickerAvailable
     - [预定资产](#预定资产) reserveTicker
     - [创建资产](#创建资产) createAsset
-  - [声明](#声明)
+  - [声明](#声明) claims
     - [添加声明](#添加声明) addClaims
     - [添加唯一性投资者声明](#添加唯一性投资者声明) addInvestorUniquenessClaim
     - [编辑声明](#编辑声明) editClaims
     - [获取CDD列表](#获取CDD列表) getCddClaims
-    - [获取被证明的列表](#获取被证明的列表)getClaimScopes
-    - 通过声明获得身份 getIdentitiesWithClaims
-    - 使用声明V2获取身份 getIdentitiesWithClaimsV2
+    - [获取被证明的列表](#获取被证明的列表) getClaimScopes
+    - [通过声明获得身份](#通过声明获得身份) getIdentitiesWithClaims
+    - [使用声明V2获取身份](#使用声明V2获取身份) getIdentitiesWithClaimsV2
     - [唯一投资者声明列表](#唯一投资者声明列表) getInvestorUniquenessClaims
     - [查询所有声明](#查询所有声明) getIssuedClaims
     - 查询所有声明V2 getIssuedClaimsV2
     - 获取目标声明 getTargetingClaims
     - 获取目标声明v2 getTargetingClaimsV2
     - 撤销声明 revokeClaims
-  - [身份](#身份)
+  - [身份](#身份) identities
     - [获取身份实例](#获取身份实例) getIdentity()
     - [验证身份标识](#验证身份标识) isIdentityValid()
     - [创建投资组合](#创建投资组合) createPortfolio()
     - [创建多个投资组合](#创建多个投资组合) createPortfolios()
     - 注册身份 registerIdentity()
-  - [网络](#网络)
+  - [网络](#网络) network
     - 按索引参数获取事件 getEventByIndexedArgs
     - 按索引参数v2获取事件 getEventByIndexedArgsV2
     - 按索引参数获取多个事件 getEventsByIndexedArgs
@@ -65,7 +65,7 @@ Polymesh是一种使您能够在区块链上创建、发行和管理数字证券
     - [获取财务部余额](#获取财务部余额) getTreasuryBalance
     - [获取版本](#获取版本) getVersion
     - [转移Polyx](#转移Polyx) transferPolyx
-  - [结算](#结算)
+  - [结算](#结算) settlements
     - [添加指令](#添加指令) addInstruction
     - [获取指令](#获取指令) getInstruction
     - [授权指令](#授权指令) affirmInstruction
@@ -116,7 +116,7 @@ async function run(){
     address:'5CK7bPZJrCXAVTs1RznLee5ZcecQTbKopS92yzPF8SS2r7mH'
   });
 
-//  出参：账户实体
+//  返回：账户实体
 //  {
 //    address: "5FWBFmHM2KraTMN8xqCccTeJoJz4STynAWUawyKYjKQUdY5g",
 //    authorizations: Authorizations,
@@ -146,7 +146,7 @@ async function run(){
     account,
   });
 
-// 出参：账户金额
+// 返回：账户金额
 // {
 //     "free": BigNumber {s: 1, e: 4, c: Array(2)}
 //     "locked": BigNumber {s: 1, e: 0, c: Array(1)},
@@ -170,7 +170,7 @@ async function run(){
   const account = await apiAlice.accountManagement.getAccount({...});
   const accountBalance = await apiAlice.accountManagement.getSigningAccount();
 
-//  出参：账户实体
+//  返回：账户实体
 //  {
 //    address: "5FWBFmHM2KraTMN8xqCccTeJoJz4STynAWUawyKYjKQUdY5g",
 //    authorizations: Authorizations,
@@ -197,7 +197,7 @@ async function run(){
   const account = await apiAlice.accountManagement.getAccount({...});
   const accountBalance = await apiAlice.accountManagement.getSigningAccounts();
 
-//  出参：账户实体
+//  返回：账户实体
 //  [{
 //    address: "5FWBFmHM2KraTMN8xqCccTeJoJz4STynAWUawyKYjKQUdY5g",
 //    authorizations: Authorizations,
@@ -212,6 +212,9 @@ run()
 
 #### 创建多重签名账户
 
+** 注意：文章作者成功创建多重签名账号，但未实现其业务功能，但已通过`polkadot.js`实现业务功能，读者可参考 **
+** 注意：polymesh-sdk 没有多重账号的其他相关API，待完善**
+
 需要使用一个拥有身份标识的账户替多个没身份标识的账户进行创建， createMultiSigAccount()
 为了安全考虑，当多重签名账户发出交易的时候，需要多个人进行签名。 n/m 比如有m个人，当一笔交易发出后，需要n个人进行签名，才能成功
 
@@ -224,10 +227,15 @@ async function run(){
   const apiAlice = await Polymesh.connect({...});
   const account = await apiAlice.accountManagement.getAccount({...});
   const create =  await apiAlice.accountManagement.createMultiSigAccount({
+    // 必填参数：最少需要签名人数
     requiredSignatures:new BigNumber(1),
+    // 必填参数：多重签名账号下的无身份标识的账号
     signers:[account],
   })
   create.run()
+
+//  返回：多重签名账户实体？
+
 }
 run()
 ```
@@ -271,6 +279,8 @@ async function run(){
     targetAccount: account
   });
   invite.run()
+
+
 }
 run()
 ```
@@ -766,6 +776,44 @@ async function run(){
 // ]
 }
 run()
+```
+
+#### 通过声明获得身份
+
+检索具有关联声明的标识列表。可以使用参数进行过滤 getIdentitiesWithClaims()
+
+```js
+import { Polymesh } from '@polymeshassociation/polymesh-sdk';
+import { LocalSigningManager } from '@polymeshassociation/local-signing-manager';
+// ......
+async function run(){
+  const signingManagerAlice = await LocalSigningManager.create({...});
+  const apiAlice = await Polymesh.connect({...});
+  const scopes = await apiAlice.claims.getIdentitiesWithClaims({
+    // 可选参数
+  });
+}
+run()
+
+```
+
+#### 使用声明V2获取身份
+
+检索具有关联声明的标识列表。可以使用参数进行过滤 getIdentitiesWithClaimsV2()
+
+```js
+import { Polymesh } from '@polymeshassociation/polymesh-sdk';
+import { LocalSigningManager } from '@polymeshassociation/local-signing-manager';
+// ......
+async function run(){
+  const signingManagerAlice = await LocalSigningManager.create({...});
+  const apiAlice = await Polymesh.connect({...});
+  const scopes = await apiAlice.claims.getIdentitiesWithClaimsV2({
+    // 可选参数
+  });
+}
+run()
+
 ```
 
 #### 唯一投资者声明列表
